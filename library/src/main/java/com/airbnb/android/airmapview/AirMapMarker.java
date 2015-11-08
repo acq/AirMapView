@@ -2,6 +2,7 @@ package com.airbnb.android.airmapview;
 
 import android.graphics.Bitmap;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -106,6 +107,11 @@ public class AirMapMarker<T> {
       } catch (NullPointerException ignored) {
         // google play services is not available
       }
+      return this;
+    }
+
+    public Builder<T> icon(BitmapDescriptor icon) {
+      markerOptions.icon(icon);
       return this;
     }
 
