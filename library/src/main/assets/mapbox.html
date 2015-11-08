@@ -143,6 +143,29 @@ function removeAllPolylines() {
   polylines = {};
 }
 
+function addPolygon(points, id, width, strokeColor, fillColor) {
+  var pointsArray = [];
+
+  for (var i = 0; i < points.length; i++) {
+    var point = points[i];
+    var position = L.latLng(point["lat"], point["lng"]);
+    pointsArray.push(point);
+  }
+
+  strokeColor = formatColor(strokeColor);
+  fillColor = formatColor(fillColor);
+  var polygon = L.polygon(pointsArray, {color: strokeColor, fillColor: fillColor, weight: width / 2}).addTo(map);
+
+  polygons[id] = polygon;
+}
+
+function removePolygon(id) {
+  var polygon = polygon[id];
+  if (polygon != null) {
+    map.removeLayer(polygon);
+  }
+}
+
 function addCircle(lat, lng, radius, strokeColor, strokeWeight, fillColor) {
     L.circle([lat, lng], radius, {color: strokeColor, weight: strokeWeight, fillColor: fillColor}).addTo(map);
 }

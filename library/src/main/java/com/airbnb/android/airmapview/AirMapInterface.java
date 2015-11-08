@@ -4,6 +4,7 @@ import com.airbnb.android.airmapview.listeners.OnLatLngScreenLocationCallback;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.Polyline;
 
 import com.airbnb.android.airmapview.listeners.InfoWindowCreator;
@@ -194,4 +195,16 @@ public interface AirMapInterface {
 
   /** Sets the type of map tiles that should be displayed */
   void setMapType(MapType type);
+
+  /**
+   * Construct a polygon with the given {@link LatLng} points
+   */
+  <T> void addPolygon(AirMapPolygon<T> polygon);
+
+  /**
+   * Remove the given {@link Polygon}
+   *
+   * @param polygon the {@link Polygon} to remove
+   */
+  void removePolygon(AirMapPolygon polygon);
 }

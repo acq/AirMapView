@@ -182,6 +182,35 @@ function removeAllPolylines() {
   polylines = {};
 }
 
+function addPolygon(points, id, strokeWidth, strokeColor, fillColor) {
+  var pointsArray = [];
+
+  for (var i = 0; i < points.length; i++) {
+    var point = points[i];
+    var position = new google.maps.LatLng(point["lat"], point["lng"]);
+    pointsArray.push(point);
+  }
+
+  strokeColor = formatColor(strokeColor);
+  fillColor = formatColor(fillColor);
+  var polygon = new google.maps.Polygon({
+    map: map,
+    paths: pointsArray,
+    strokeColor: strokeColor,
+    strokeWeight: strokeWidth / 2,
+    fillColor: fillColor
+  });
+
+  polygons[id] = polygon;
+}
+
+function removePolygon(id) {
+  var polygon = polygons[id];
+  if (polygon != null) {
+    polygons[id].setMap(null);
+  }
+}
+
 function addCircle(lat, lng, radius, strokeColor, strokeWeight, fillColor) {
   var position = new google.maps.LatLng(lat, lng);
   var populationOptions = {

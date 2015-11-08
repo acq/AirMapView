@@ -279,6 +279,22 @@ public class AirMapView extends FrameLayout
     return false;
   }
 
+  public boolean addPolygon(AirMapPolygon polygon) {
+    if (isInitialized()) {
+      mapInterface.addPolygon(polygon);
+      return true;
+    }
+    return false;
+  }
+
+  public boolean removePolygon(AirMapPolygon polygon) {
+    if (isInitialized()) {
+      mapInterface.removePolygon(polygon);
+      return true;
+    }
+    return false;
+  }
+
   public boolean isInitialized() {
     return mapInterface != null && mapInterface.isInitialized();
   }
