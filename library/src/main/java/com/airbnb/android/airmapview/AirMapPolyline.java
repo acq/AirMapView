@@ -1,11 +1,12 @@
 package com.airbnb.android.airmapview;
 
+import android.graphics.Color;
+import android.support.annotation.NonNull;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-
-import android.graphics.Color;
 
 import java.util.List;
 
@@ -19,12 +20,10 @@ public class AirMapPolyline<T> {
   private static final int STROKE_COLOR = Color.BLUE;
 
   private T object;
-  private int strokeWidth;
   private long id;
-  private List<LatLng> points;
   private String title;
-  private int strokeColor;
-  private Polyline googlePolyline;
+  private PolylineOptions polylineOptions;
+  private Polyline        googlePolyline;
 
   public AirMapPolyline(List<LatLng> points, long id) {
     this(null, points, id);
@@ -36,10 +35,17 @@ public class AirMapPolyline<T> {
 
   public AirMapPolyline(T object, List<LatLng> points, long id, int strokeWidth, int strokeColor) {
     this.object = object;
-    this.points = points;
     this.id = id;
-    this.strokeWidth = strokeWidth;
-    this.strokeColor = strokeColor;
+    polylineOptions = new PolylineOptions();
+    polylineOptions.addAll(points);
+    polylineOptions.color(strokeColor);
+    polylineOptions.width(strokeWidth);
+  }
+
+  public AirMapPolyline(T object, long id, PolylineOptions polylineOptions) {
+    this.object = object;
+    this.id = id;
+    this.polylineOptions = polylineOptions;
   }
 
   public long getId() {
@@ -51,11 +57,12 @@ public class AirMapPolyline<T> {
   }
 
   public List<LatLng> getPoints() {
-    return points;
+    return polylineOptions.getPoints();
   }
 
   public void setPoints(List<LatLng> points) {
-    this.points = points;
+    polylineOptions.getPoints().clear();
+    polylineOptions.getPoints().addAll(points);
   }
 
   public String getTitle() {
@@ -75,11 +82,11 @@ public class AirMapPolyline<T> {
   }
 
   public int getStrokeWidth() {
-    return strokeWidth;
+    return (int) polylineOptions.getWidth();
   }
 
   public int getStrokeColor() {
-    return strokeColor;
+    return polylineOptions.getColor();
   }
 
   /**
@@ -89,10 +96,7 @@ public class AirMapPolyline<T> {
    */
   public void addToGoogleMap(GoogleMap googleMap) {
     // add the polyline and keep a reference so it can be removed
-    googlePolyline = googleMap.addPolyline(new PolylineOptions()
-                                                .addAll(points)
-                                                .width(strokeWidth)
-                                                .color(strokeColor));
+    googlePolyline = googleMap.addPolyline(polylineOptions);
   }
 
   /**
@@ -106,5 +110,82 @@ public class AirMapPolyline<T> {
       return true;
     }
     return false;
+  }
+
+  public PolylineOptions getPolylineOptions() {
+    return polylineOptions;
+  }
+
+  public Polyline getGooglePolyline() {
+    return googlePolyline;
+  }
+
+  public void setGooglePolyline(Polyline googlePolyline) {
+    this.googlePolyline = googlePolyline;
+  }
+
+  public static class Builder<T> {
+    private final PolylineOptions polylineOptions = new PolylineOptions();
+    private T    object;
+    private long id;
+
+    public Builder() {
+      polylineOptions.width(STROKE_WIDTH);
+      polylineOptions.color(STROKE_COLOR);
+    }
+
+    public Builder<T> object(T object) {
+      this.object = object;
+      return this;
+    }
+
+    public Builder<T> id(long id) {
+      this.id = id;
+      return this;
+    }
+
+    public Builder<T> color(int color) {
+      polylineOptions.color(color);
+      return this;
+    }
+
+    public Builder<T> width(float width) {
+      this.polylineOptions.width(width);
+      return this;
+    }
+
+    public Builder<T> geodesic(boolean geodesic) {
+      this.polylineOptions.geodesic(geodesic);
+      return this;
+    }
+
+    public Builder<T> zIndex(float zIndex) {
+      this.polylineOptions.zIndex(zIndex);
+      return this;
+    }
+
+    public Builder<T> visible(boolean visible) {
+      this.polylineOptions.visible(visible);
+      return this;
+    }
+
+    public Builder<T> add(LatLng point) {
+      this.polylineOptions.add(point);
+      return this;
+    }
+
+    public Builder<T> add(LatLng... points) {
+      this.polylineOptions.add(points);
+      return this;
+    }
+
+    public Builder<T> addAll(@NonNull Iterable<LatLng> points) {
+      this.polylineOptions.addAll(points);
+      return this;
+    }
+
+    public AirMapPolyline<T> build() {
+      return new AirMapPolyline<>(object, id, polylineOptions);
+    }
   }
 }
