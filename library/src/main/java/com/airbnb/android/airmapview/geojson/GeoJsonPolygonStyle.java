@@ -1,5 +1,6 @@
 package com.airbnb.android.airmapview.geojson;
 
+import com.airbnb.android.airmapview.AirMapPolygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.util.Arrays;
@@ -160,15 +161,15 @@ public class GeoJsonPolygonStyle extends Observable implements GeoJsonStyle {
      *
      * @return new PolygonOptions object
      */
-    public PolygonOptions toPolygonOptions() {
-        PolygonOptions polygonOptions = new PolygonOptions();
-        polygonOptions.fillColor(mPolygonOptions.getFillColor());
-        polygonOptions.geodesic(mPolygonOptions.isGeodesic());
-        polygonOptions.strokeColor(mPolygonOptions.getStrokeColor());
-        polygonOptions.strokeWidth(mPolygonOptions.getStrokeWidth());
-        polygonOptions.visible(mPolygonOptions.isVisible());
-        polygonOptions.zIndex(mPolygonOptions.getZIndex());
-        return polygonOptions;
+    public AirMapPolygon.Builder toPolygon() {
+        AirMapPolygon.Builder builder = new AirMapPolygon.Builder<>();
+        builder.fillColor(mPolygonOptions.getFillColor());
+        builder.geodesic(mPolygonOptions.isGeodesic());
+        builder.strokeColor(mPolygonOptions.getStrokeColor());
+        builder.strokeWidth(mPolygonOptions.getStrokeWidth());
+        builder.visible(mPolygonOptions.isVisible());
+        builder.zIndex(mPolygonOptions.getZIndex());
+        return builder;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.airbnb.android.airmapview.geojson;
 
+import com.airbnb.android.airmapview.AirMapMarker;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -277,20 +278,20 @@ public class GeoJsonPointStyle extends Observable implements GeoJsonStyle {
      *
      * @return new MarkerOptions object
      */
-    public MarkerOptions toMarkerOptions() {
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.alpha(mMarkerOptions.getAlpha());
-        markerOptions.anchor(mMarkerOptions.getAnchorU(), mMarkerOptions.getAnchorV());
-        markerOptions.draggable(mMarkerOptions.isDraggable());
-        markerOptions.flat(mMarkerOptions.isFlat());
-        markerOptions.icon(mMarkerOptions.getIcon());
-        markerOptions.infoWindowAnchor(mMarkerOptions.getInfoWindowAnchorU(),
+    public AirMapMarker.Builder<GeoJsonPoint> toMarker() {
+        AirMapMarker.Builder<GeoJsonPoint> builder = new AirMapMarker.Builder<>();
+        builder.alpha(mMarkerOptions.getAlpha());
+        builder.anchor(mMarkerOptions.getAnchorU(), mMarkerOptions.getAnchorV());
+        builder.draggable(mMarkerOptions.isDraggable());
+        builder.flat(mMarkerOptions.isFlat());
+        builder.icon(mMarkerOptions.getIcon());
+        builder.infoWindowAnchor(mMarkerOptions.getInfoWindowAnchorU(),
                 mMarkerOptions.getInfoWindowAnchorV());
-        markerOptions.rotation(mMarkerOptions.getRotation());
-        markerOptions.snippet(mMarkerOptions.getSnippet());
-        markerOptions.title(mMarkerOptions.getTitle());
-        markerOptions.visible(mMarkerOptions.isVisible());
-        return markerOptions;
+        builder.rotation(mMarkerOptions.getRotation());
+        builder.snippet(mMarkerOptions.getSnippet());
+        builder.title(mMarkerOptions.getTitle());
+        builder.visible(mMarkerOptions.isVisible());
+        return builder;
     }
 
     @Override

@@ -21,6 +21,7 @@ import com.airbnb.android.airmapview.AirMapViewTypes;
 import com.airbnb.android.airmapview.DefaultAirMapViewBuilder;
 import com.airbnb.android.airmapview.MapType;
 import com.airbnb.android.airmapview.WebAirMapViewBuilder;
+import com.airbnb.android.airmapview.geojson.GeoJsonLayer;
 import com.airbnb.android.airmapview.listeners.OnCameraChangeListener;
 import com.airbnb.android.airmapview.listeners.OnCameraMoveListener;
 import com.airbnb.android.airmapview.listeners.OnInfoWindowClickListener;
@@ -30,6 +31,9 @@ import com.airbnb.android.airmapview.listeners.OnMapInitializedListener;
 import com.airbnb.android.airmapview.listeners.OnMapMarkerClickListener;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Arrays;
 
@@ -150,6 +154,14 @@ public class MainActivity extends AppCompatActivity
 
     // Add Circle
     map.drawCircle(new LatLng(37.78443, -122.40805), 1000);
+
+    // Add GeoJSON
+    try {
+      GeoJsonLayer layer = new GeoJsonLayer(map, new JSONObject("{\"geometry\":{\"geometries\":[{\"coordinates\":[[[-122.404959,37.795337],[-122.404055,37.790751],[-122.402694,37.790937],[-122.402535,37.790006],[-122.403858,37.789819],[-122.403478,37.787965],[-122.403247,37.787814],[-122.405883,37.785718],[-122.406236,37.785793],[-122.406602,37.787583],[-122.408244,37.787369],[-122.408655,37.789244],[-122.411913,37.788812],[-122.41229,37.790669],[-122.413931,37.79047],[-122.414883,37.79503],[-122.411553,37.795409],[-122.411484,37.795033],[-122.411024,37.795145],[-122.411087,37.795467],[-122.407091,37.79597],[-122.407014,37.795587],[-122.406591,37.795697],[-122.406649,37.796027],[-122.40568,37.796152],[-122.405526,37.795292],[-122.404959,37.795337]]],\"type\":\"Polygon\"}],\"type\":\"GeometryCollection\"},\"id\":\"94108\",\"properties\":{\"id\":\"94108\"},\"type\":\"Feature\"}"));
+      layer.addLayerToMap();
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
 
     // enable my location
     map.setMyLocationEnabled(true);

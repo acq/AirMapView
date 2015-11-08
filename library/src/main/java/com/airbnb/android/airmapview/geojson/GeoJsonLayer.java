@@ -2,7 +2,7 @@ package com.airbnb.android.airmapview.geojson;
 
 import android.content.Context;
 
-import com.google.android.gms.maps.GoogleMap;
+import com.airbnb.android.airmapview.AirMapView;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import org.json.JSONException;
@@ -40,7 +40,7 @@ public class GeoJsonLayer {
      * @param map         map where the layer is to be rendered
      * @param geoJsonFile GeoJSON data to add to the layer
      */
-    public GeoJsonLayer(GoogleMap map, JSONObject geoJsonFile) {
+    public GeoJsonLayer(AirMapView map, JSONObject geoJsonFile) {
         if (geoJsonFile == null) {
             throw new IllegalArgumentException("GeoJSON file cannot be null");
         }
@@ -65,7 +65,7 @@ public class GeoJsonLayer {
      * @throws IOException   if the file cannot be open for read
      * @throws JSONException if the JSON file has invalid syntax and cannot be parsed successfully
      */
-    public GeoJsonLayer(GoogleMap map, int resourceId, Context context)
+    public GeoJsonLayer(AirMapView map, int resourceId, Context context)
             throws IOException, JSONException {
         this(map, createJsonFileObject(context.getResources().openRawResource(resourceId)));
     }
@@ -142,7 +142,7 @@ public class GeoJsonLayer {
      *
      * @return map on which the layer is rendered
      */
-    public GoogleMap getMap() {
+    public AirMapView getMap() {
         return mRenderer.getMap();
     }
 
@@ -152,7 +152,7 @@ public class GeoJsonLayer {
      *
      * @param map to render the layer on, if null the layer is cleared from the current map
      */
-    public void setMap(GoogleMap map) {
+    public void setMap(AirMapView map) {
         mRenderer.setMap(map);
     }
 

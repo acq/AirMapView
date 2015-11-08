@@ -1,5 +1,6 @@
 package com.airbnb.android.airmapview.geojson;
 
+import com.airbnb.android.airmapview.AirMapPolyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.Arrays;
@@ -142,14 +143,14 @@ public class GeoJsonLineStringStyle extends Observable implements GeoJsonStyle {
      *
      * @return new PolylineOptions object
      */
-    public PolylineOptions toPolylineOptions() {
-        PolylineOptions polylineOptions = new PolylineOptions();
-        polylineOptions.color(mPolylineOptions.getColor());
-        polylineOptions.geodesic(mPolylineOptions.isGeodesic());
-        polylineOptions.visible(mPolylineOptions.isVisible());
-        polylineOptions.width(mPolylineOptions.getWidth());
-        polylineOptions.zIndex(mPolylineOptions.getZIndex());
-        return polylineOptions;
+    public AirMapPolyline.Builder<GeoJsonLineString> toPolyline() {
+        AirMapPolyline.Builder<GeoJsonLineString> builder = new AirMapPolyline.Builder<>();
+        builder.color(mPolylineOptions.getColor());
+        builder.geodesic(mPolylineOptions.isGeodesic());
+        builder.visible(mPolylineOptions.isVisible());
+        builder.width(mPolylineOptions.getWidth());
+        builder.zIndex(mPolylineOptions.getZIndex());
+        return builder;
     }
 
     @Override
