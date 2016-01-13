@@ -83,9 +83,14 @@ public class AirMapMarker<T> {
   public static class Builder<T> {
     private T object;
     private long id;
-    private final MarkerOptions markerOptions = new MarkerOptions();
+    private final MarkerOptions markerOptions;
 
     public Builder() {
+      markerOptions = new MarkerOptions();
+    }
+
+    public Builder(MarkerOptions markerOptions) {
+      this.markerOptions = markerOptions;
     }
 
     public Builder<T> object(T object) {

@@ -1,5 +1,6 @@
 package com.airbnb.android.airmapview.utils.geojson;
 
+import com.airbnb.android.airmapview.AirMapView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -11,9 +12,9 @@ import org.json.JSONObject;
 import android.graphics.Color;
 
 public class GeoJsonLayerTest extends TestCase {
-    GoogleMap map;
+    AirMapView map;
     GeoJsonLayer mLayer;
-    GoogleMap map2;
+    AirMapView map2;
     public void setUp() throws Exception {
         super.setUp();
         mLayer = new GeoJsonLayer(map, createFeatureCollection());

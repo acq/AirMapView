@@ -1,11 +1,11 @@
 package com.airbnb.android.airmapview.utils.geojson;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.Marker;
+import com.airbnb.android.airmapview.AirMapMarker;
+import com.airbnb.android.airmapview.AirMapPolygon;
+import com.airbnb.android.airmapview.AirMapPolyline;
+import com.airbnb.android.airmapview.AirMapView;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
@@ -41,14 +41,14 @@ import java.util.Set;
 
     private boolean mLayerOnMap;
 
-    private GoogleMap mMap;
+    private AirMapView mMap;
 
     /**
      * Creates a new GeoJsonRender object
      *
      * @param map map to place GeoJsonFeature objects on
      */
-    /* package */ GeoJsonRenderer(GoogleMap map, HashMap<GeoJsonFeature, Object> features) {
+    /* package */ GeoJsonRenderer(AirMapView map, HashMap<GeoJsonFeature, Object> features) {
         mMap = map;
         mFeatures = features;
         mLayerOnMap = false;
@@ -67,13 +67,13 @@ import java.util.Set;
      *
      * @param mapObject map object or array of map objects to remove from the map
      */
-    private static void removeFromMap(Object mapObject) {
-        if (mapObject instanceof Marker) {
-            ((Marker) mapObject).remove();
-        } else if (mapObject instanceof Polyline) {
-            ((Polyline) mapObject).remove();
-        } else if (mapObject instanceof Polygon) {
-            ((Polygon) mapObject).remove();
+    private void removeFromMap(Object mapObject) {
+        if (mapObject instanceof AirMapMarker) {
+            mMap.removeMarker((AirMapMarker) mapObject);
+        } else if (mapObject instanceof AirMapPolyline) {
+            mMap.removePolyline((AirMapPolyline) mapObject);
+        } else if (mapObject instanceof AirMapPolygon) {
+            mMap.removePolygon((AirMapPolygon) mapObject);
         } else if (mapObject instanceof ArrayList) {
             for (Object mapObjectElement : (ArrayList) mapObject) {
                 removeFromMap(mapObjectElement);
@@ -86,11 +86,11 @@ import java.util.Set;
     }
 
     /**
-     * Gets the GoogleMap that GeoJsonFeature objects are being placed on
+     * Gets the AirMapView that GeoJsonFeature objects are being placed on
      *
-     * @return GoogleMap
+     * @return AirMapView
      */
-    /* package */ GoogleMap getMap() {
+    /* package */ AirMapView getMap() {
         return mMap;
     }
 
@@ -98,9 +98,9 @@ import java.util.Set;
      * Changes the map that GeoJsonFeature objects are being drawn onto. Existing objects are
      * removed from the previous map and drawn onto the new map.
      *
-     * @param map GoogleMap to place GeoJsonFeature objects on
+     * @param map AirMapView to place GeoJsonFeature objects on
      */
-    /* package */ void setMap(GoogleMap map) {
+    /* package */ void setMap(AirMapView map) {
         for (GeoJsonFeature feature : getFeatures()) {
             redrawFeatureToMap(feature, map);
         }
@@ -261,12 +261,14 @@ import java.util.Set;
      *
      * @param pointStyle contains relevant styling properties for the Marker
      * @param point      contains coordinates for the Marker
-     * @return Marker object created from the given GeoJsonPoint
+     * @return AirMapMarker object created from the given GeoJsonPoint
      */
-    private Marker addPointToMap(GeoJsonPointStyle pointStyle, GeoJsonPoint point) {
+    private AirMapMarker addPointToMap(GeoJsonPointStyle pointStyle, GeoJsonPoint point) {
         MarkerOptions markerOptions = pointStyle.toMarkerOptions();
         markerOptions.position(point.getCoordinates());
-        return mMap.addMarker(markerOptions);
+        AirMapMarker marker = new AirMapMarker.Builder<>(markerOptions).build();
+        mMap.addMarker(marker);
+        return marker;
     }
 
     /**
@@ -276,9 +278,9 @@ import java.util.Set;
      * @param multiPoint contains an array of GeoJsonPoints
      * @return array of Markers that have been added to the map
      */
-    private ArrayList<Marker> addMultiPointToMap(GeoJsonPointStyle pointStyle,
+    private ArrayList<AirMapMarker> addMultiPointToMap(GeoJsonPointStyle pointStyle,
                                                  GeoJsonMultiPoint multiPoint) {
-        ArrayList<Marker> markers = new ArrayList<Marker>();
+        ArrayList<AirMapMarker> markers = new ArrayList<>();
         for (GeoJsonPoint geoJsonPoint : multiPoint.getPoints()) {
             markers.add(addPointToMap(pointStyle, geoJsonPoint));
         }
@@ -292,12 +294,14 @@ import java.util.Set;
      * @param lineString      contains coordinates for the Polyline
      * @return Polyline object created from given GeoJsonLineString
      */
-    private Polyline addLineStringToMap(GeoJsonLineStringStyle lineStringStyle,
+    private AirMapPolyline addLineStringToMap(GeoJsonLineStringStyle lineStringStyle,
                                         GeoJsonLineString lineString) {
         PolylineOptions polylineOptions = lineStringStyle.toPolylineOptions();
         // Add coordinates
         polylineOptions.addAll(lineString.getCoordinates());
-        return mMap.addPolyline(polylineOptions);
+        AirMapPolyline polyline = new AirMapPolyline.Builder<>(polylineOptions).build();
+        mMap.addPolyline(polyline);
+        return polyline;
     }
 
     /**
@@ -308,9 +312,9 @@ import java.util.Set;
      * @param multiLineString contains an array of GeoJsonLineStrings
      * @return array of Polylines that have been added to the map
      */
-    private ArrayList<Polyline> addMultiLineStringToMap(GeoJsonLineStringStyle lineStringStyle,
+    private ArrayList<AirMapPolyline> addMultiLineStringToMap(GeoJsonLineStringStyle lineStringStyle,
                                                         GeoJsonMultiLineString multiLineString) {
-        ArrayList<Polyline> polylines = new ArrayList<Polyline>();
+        ArrayList<AirMapPolyline> polylines = new ArrayList<>();
         for (GeoJsonLineString geoJsonLineString : multiLineString.getLineStrings()) {
             polylines.add(addLineStringToMap(lineStringStyle, geoJsonLineString));
         }
@@ -324,7 +328,7 @@ import java.util.Set;
      * @param polygon      contains coordinates for the Polygon
      * @return Polygon object created from given GeoJsonPolygon
      */
-    private Polygon addPolygonToMap(GeoJsonPolygonStyle polygonStyle, GeoJsonPolygon polygon) {
+    private AirMapPolygon addPolygonToMap(GeoJsonPolygonStyle polygonStyle, GeoJsonPolygon polygon) {
         PolygonOptions polygonOptions = polygonStyle.toPolygonOptions();
         // First array of coordinates are the outline
         polygonOptions.addAll(polygon.getCoordinates().get(POLYGON_OUTER_COORDINATE_INDEX));
@@ -333,7 +337,9 @@ import java.util.Set;
                 i++) {
             polygonOptions.addHole(polygon.getCoordinates().get(i));
         }
-        return mMap.addPolygon(polygonOptions);
+        AirMapPolygon result = new AirMapPolygon.Builder<>(polygonOptions).build();
+        mMap.addPolygon(result);
+        return result;
     }
 
     /**
@@ -343,9 +349,9 @@ import java.util.Set;
      * @param multiPolygon contains an array of GeoJsonPolygons
      * @return array of Polygons that have been added to the map
      */
-    private ArrayList<Polygon> addMultiPolygonToMap(GeoJsonPolygonStyle polygonStyle,
+    private ArrayList<AirMapPolygon> addMultiPolygonToMap(GeoJsonPolygonStyle polygonStyle,
                                                     GeoJsonMultiPolygon multiPolygon) {
-        ArrayList<Polygon> polygons = new ArrayList<Polygon>();
+        ArrayList<AirMapPolygon> polygons = new ArrayList<>();
         for (GeoJsonPolygon geoJsonPolygon : multiPolygon.getPolygons()) {
             polygons.add(addPolygonToMap(polygonStyle, geoJsonPolygon));
         }
@@ -380,7 +386,7 @@ import java.util.Set;
         redrawFeatureToMap(feature, mMap);
     }
 
-    private void redrawFeatureToMap(GeoJsonFeature feature, GoogleMap map) {
+    private void redrawFeatureToMap(GeoJsonFeature feature, AirMapView map) {
         removeFromMap(mFeatures.get(feature));
         mFeatures.put(feature, FEATURE_NOT_ON_MAP);
         mMap = map;

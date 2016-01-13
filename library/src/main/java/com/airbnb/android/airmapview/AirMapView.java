@@ -260,6 +260,14 @@ public class AirMapView extends FrameLayout
     onInfoWindowClickListener = listener;
   }
 
+  public boolean removeMarker(AirMapMarker marker) {
+    if (isInitialized()) {
+      mapInterface.removeMarker(marker);
+      return true;
+    }
+    return false;
+  }
+
   public void clearMarkers() {
     if (isInitialized()) {
       mapInterface.clearMarkers();

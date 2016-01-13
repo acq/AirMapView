@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 public class AirMapPolygon<T> {
 
@@ -44,13 +45,18 @@ public class AirMapPolygon<T> {
   }
 
   public static class Builder<T> {
-    private final PolygonOptions polygonOptions = new PolygonOptions();
+    private final PolygonOptions polygonOptions;
     private T object;
     private long id;
 
     public Builder() {
+      polygonOptions = new PolygonOptions();
       polygonOptions.strokeWidth(STROKE_WIDTH);
       polygonOptions.strokeColor(STROKE_COLOR);
+    }
+
+    public Builder(PolygonOptions polygonOptions) {
+      this.polygonOptions = polygonOptions;
     }
 
     public Builder<T> object(T object) {
