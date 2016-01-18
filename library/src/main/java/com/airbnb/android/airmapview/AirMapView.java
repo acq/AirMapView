@@ -19,6 +19,7 @@ import com.airbnb.android.airmapview.listeners.OnMapInitializedListener;
 import com.airbnb.android.airmapview.listeners.OnMapLoadedListener;
 import com.airbnb.android.airmapview.listeners.OnMapMarkerClickListener;
 import com.airbnb.android.airmapview.listeners.OnMapMarkerDragListener;
+import com.airbnb.android.airmapview.utils.MarkerManager;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -258,14 +259,6 @@ public class AirMapView extends FrameLayout
 
   public void setOnInfoWindowClickListener(OnInfoWindowClickListener listener) {
     onInfoWindowClickListener = listener;
-  }
-
-  public boolean removeMarker(AirMapMarker marker) {
-    if (isInitialized()) {
-      mapInterface.removeMarker(marker);
-      return true;
-    }
-    return false;
   }
 
   public void clearMarkers() {

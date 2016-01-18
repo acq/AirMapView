@@ -18,7 +18,13 @@ package com.airbnb.android.airmapview.utils;
 
 import android.view.View;
 
-import com.google.android.gms.maps.GoogleMap;
+import com.airbnb.android.airmapview.AirMapMarker;
+import com.airbnb.android.airmapview.AirMapView;
+import com.airbnb.android.airmapview.listeners.InfoWindowCreator;
+import com.airbnb.android.airmapview.listeners.OnInfoWindowClickListener;
+import com.airbnb.android.airmapview.listeners.OnMapMarkerClickListener;
+import com.airbnb.android.airmapview.listeners.OnMapMarkerDragListener;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -35,13 +41,15 @@ import java.util.Set;
  * All marker operations (adds and removes) should occur via its collection class. That is, don't
  * add a marker via a collection, then remove it via Marker.remove()
  */
-public class MarkerManager implements GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMarkerDragListener, GoogleMap.InfoWindowAdapter {
-    private final GoogleMap mMap;
+public class MarkerManager implements OnInfoWindowClickListener, OnMapMarkerClickListener, OnMapMarkerDragListener, InfoWindowCreator {
+    private final AirMapView mMap;
 
-    private final Map<String, Collection> mNamedCollections = new HashMap<String, Collection>();
-    private final Map<Marker, Collection> mAllMarkers = new HashMap<Marker, Collection>();
+    private final Map<String, Collection> mNamedCollections = new HashMap<>();
+    private final Map<AirMapMarker, Collection> mAllMarkers = new HashMap<>();
+    private final Map<Long, AirMapMarker> mIdsToMarkers = new HashMap<>();
+    private final Map<Marker, AirMapMarker> mNativeMarkersToMarkers = new HashMap<>();
 
-    public MarkerManager(GoogleMap map) {
+    public MarkerManager(AirMapView map) {
         this.mMap = map;
     }
 
@@ -71,25 +79,25 @@ public class MarkerManager implements GoogleMap.OnInfoWindowClickListener, Googl
     }
 
     @Override
-    public View getInfoWindow(Marker marker) {
+    public View createInfoWindow(AirMapMarker marker) {
         Collection collection = mAllMarkers.get(marker);
-        if (collection != null && collection.mInfoWindowAdapter != null) {
-            return collection.mInfoWindowAdapter.getInfoWindow(marker);
+        if (collection != null && collection.mInfoWindowCreator != null) {
+            return collection.mInfoWindowCreator.createInfoWindow(marker);
         }
         return null;
     }
 
     @Override
-    public View getInfoContents(Marker marker) {
+    public View createInfoContents(AirMapMarker marker) {
         Collection collection = mAllMarkers.get(marker);
-        if (collection != null && collection.mInfoWindowAdapter != null) {
-            return collection.mInfoWindowAdapter.getInfoContents(marker);
+        if (collection != null && collection.mInfoWindowCreator != null) {
+            return collection.mInfoWindowCreator.createInfoContents(marker);
         }
         return null;
     }
 
     @Override
-    public void onInfoWindowClick(Marker marker) {
+    public void onInfoWindowClick(AirMapMarker marker) {
         Collection collection = mAllMarkers.get(marker);
         if (collection != null && collection.mInfoWindowClickListener != null) {
             collection.mInfoWindowClickListener.onInfoWindowClick(marker);
@@ -97,35 +105,58 @@ public class MarkerManager implements GoogleMap.OnInfoWindowClickListener, Googl
     }
 
     @Override
-    public boolean onMarkerClick(Marker marker) {
+    public void onMapMarkerClick(AirMapMarker marker) {
         Collection collection = mAllMarkers.get(marker);
         if (collection != null && collection.mMarkerClickListener != null) {
-            return collection.mMarkerClickListener.onMarkerClick(marker);
-        }
-        return false;
-    }
-
-    @Override
-    public void onMarkerDragStart(Marker marker) {
-        Collection collection = mAllMarkers.get(marker);
-        if (collection != null && collection.mMarkerDragListener != null) {
-            collection.mMarkerDragListener.onMarkerDragStart(marker);
+            collection.mMarkerClickListener.onMapMarkerClick(marker);
         }
     }
 
     @Override
-    public void onMarkerDrag(Marker marker) {
-        Collection collection = mAllMarkers.get(marker);
+    public void onMapMarkerDragStart(Marker marker) {
+        Collection collection = mAllMarkers.get(getMapMarker(marker));
         if (collection != null && collection.mMarkerDragListener != null) {
-            collection.mMarkerDragListener.onMarkerDrag(marker);
+            collection.mMarkerDragListener.onMapMarkerDragStart(marker);
         }
     }
 
     @Override
-    public void onMarkerDragEnd(Marker marker) {
-        Collection collection = mAllMarkers.get(marker);
+    public void onMapMarkerDrag(Marker marker) {
+        Collection collection = mAllMarkers.get(getMapMarker(marker));
         if (collection != null && collection.mMarkerDragListener != null) {
-            collection.mMarkerDragListener.onMarkerDragEnd(marker);
+            collection.mMarkerDragListener.onMapMarkerDrag(marker);
+        }
+    }
+
+    @Override
+    public void onMapMarkerDragEnd(Marker marker) {
+        Collection collection = mAllMarkers.get(getMapMarker(marker));
+        if (collection != null && collection.mMarkerDragListener != null) {
+            collection.mMarkerDragListener.onMapMarkerDragEnd(marker);
+        }
+    }
+
+    @Override
+    public void onMapMarkerDragStart(long id, LatLng latLng) {
+        Collection collection = mAllMarkers.get(getMapMarker(id));
+        if (collection != null && collection.mMarkerDragListener != null) {
+            collection.mMarkerDragListener.onMapMarkerDragStart(id, latLng);
+        }
+    }
+
+    @Override
+    public void onMapMarkerDrag(long id, LatLng latLng) {
+        Collection collection = mAllMarkers.get(getMapMarker(id));
+        if (collection != null && collection.mMarkerDragListener != null) {
+            collection.mMarkerDragListener.onMapMarkerDrag(id, latLng);
+        }
+    }
+
+    @Override
+    public void onMapMarkerDragEnd(long id, LatLng latLng) {
+        Collection collection = mAllMarkers.get(getMapMarker(id));
+        if (collection != null && collection.mMarkerDragListener != null) {
+            collection.mMarkerDragListener.onMapMarkerDragEnd(id, latLng);
         }
     }
 
@@ -135,63 +166,78 @@ public class MarkerManager implements GoogleMap.OnInfoWindowClickListener, Googl
      * @param marker the marker to remove.
      * @return true if the marker was removed.
      */
-    public boolean remove(Marker marker) {
+    public boolean remove(AirMapMarker marker) {
         Collection collection = mAllMarkers.get(marker);
         return collection != null && collection.remove(marker);
     }
 
+    public AirMapMarker getMapMarker(Marker marker) {
+        return mNativeMarkersToMarkers.get(marker);
+    }
+
+    public AirMapMarker getMapMarker(long id) {
+        return mIdsToMarkers.get(id);
+    }
+
     public class Collection {
-        private final Set<Marker> mMarkers = new HashSet<Marker>();
-        private GoogleMap.OnInfoWindowClickListener mInfoWindowClickListener;
-        private GoogleMap.OnMarkerClickListener mMarkerClickListener;
-        private GoogleMap.OnMarkerDragListener mMarkerDragListener;
-        private GoogleMap.InfoWindowAdapter mInfoWindowAdapter;
+        private final Set<AirMapMarker> mMarkers = new HashSet<>();
+        private OnInfoWindowClickListener mInfoWindowClickListener;
+        private OnMapMarkerClickListener mMarkerClickListener;
+        private OnMapMarkerDragListener mMarkerDragListener;
+        private InfoWindowCreator mInfoWindowCreator;
 
         public Collection() {
         }
 
-        public Marker addMarker(MarkerOptions opts) {
-            Marker marker = mMap.addMarker(opts);
+        public AirMapMarker addMarker(MarkerOptions opts) {
+            AirMapMarker marker = new AirMapMarker.Builder<>(opts).build();
+            mMap.addMarker(marker);
             mMarkers.add(marker);
             mAllMarkers.put(marker, Collection.this);
+            mNativeMarkersToMarkers.put(marker.getMarker(), marker);
+            mIdsToMarkers.put(marker.getId(), marker);
             return marker;
         }
 
-        public boolean remove(Marker marker) {
+        public boolean remove(AirMapMarker marker) {
             if (mMarkers.remove(marker)) {
                 mAllMarkers.remove(marker);
-                marker.remove();
+                mIdsToMarkers.remove(marker.getId());
+                mNativeMarkersToMarkers.remove(marker.getMarker());
+                mMap.removeMarker(marker);
                 return true;
             }
             return false;
         }
 
         public void clear() {
-            for (Marker marker : mMarkers) {
-                marker.remove();
+            for (AirMapMarker marker : mMarkers) {
+                mMap.removeMarker(marker);
                 mAllMarkers.remove(marker);
+                mNativeMarkersToMarkers.remove(marker.getMarker());
+                mIdsToMarkers.remove(marker.getId());
             }
             mMarkers.clear();
         }
 
-        public java.util.Collection<Marker> getMarkers() {
+        public java.util.Collection<AirMapMarker> getMarkers() {
             return Collections.unmodifiableCollection(mMarkers);
         }
 
-        public void setOnInfoWindowClickListener(GoogleMap.OnInfoWindowClickListener infoWindowClickListener) {
+        public void setOnInfoWindowClickListener(OnInfoWindowClickListener infoWindowClickListener) {
             mInfoWindowClickListener = infoWindowClickListener;
         }
 
-        public void setOnMarkerClickListener(GoogleMap.OnMarkerClickListener markerClickListener) {
+        public void setOnMapMarkerClickListener(OnMapMarkerClickListener markerClickListener) {
             mMarkerClickListener = markerClickListener;
         }
 
-        public void setOnMarkerDragListener(GoogleMap.OnMarkerDragListener markerDragListener) {
+        public void setOnMapMarkerDragListener(OnMapMarkerDragListener markerDragListener) {
             mMarkerDragListener = markerDragListener;
         }
 
-        public void setOnInfoWindowAdapter(GoogleMap.InfoWindowAdapter infoWindowAdapter) {
-            mInfoWindowAdapter = infoWindowAdapter;
+        public void setOnInfoWindowCreator(InfoWindowCreator infoWindowCreator) {
+            mInfoWindowCreator = infoWindowCreator;
         }
     }
 }

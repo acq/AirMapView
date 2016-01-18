@@ -134,6 +134,13 @@ function showDefaultInfoWindow(id){
 // Not needed
 }
 
+function moveMarker(lat, long, id) {
+  var marker = markers[id];
+  if (marker != null) {
+    marker.setLatLng( new L.LatLng(lat, long) );
+  }
+}
+
 function removeMarker(id) {
   var marker = markers[id];
   if (marker != null) {

@@ -6,4 +6,5 @@ import com.airbnb.android.airmapview.AirMapMarker;
 
 public interface InfoWindowCreator {
   View createInfoWindow(AirMapMarker<?> airMarker);
+  View createInfoContents(AirMapMarker<?> airMarker);
 }

@@ -20,15 +20,20 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.Marker;
+import com.airbnb.android.airmapview.AirMapMarker;
+import com.airbnb.android.airmapview.AirMapView;
+import com.airbnb.android.airmapview.listeners.OnCameraChangeListener;
+import com.airbnb.android.airmapview.listeners.OnInfoWindowClickListener;
+import com.airbnb.android.airmapview.listeners.OnMapMarkerClickListener;
 import com.airbnb.android.airmapview.utils.MarkerManager;
 import com.airbnb.android.airmapview.utils.clustering.algo.Algorithm;
 import com.airbnb.android.airmapview.utils.clustering.algo.NonHierarchicalDistanceBasedAlgorithm;
 import com.airbnb.android.airmapview.utils.clustering.algo.PreCachingAlgorithmDecorator;
 import com.airbnb.android.airmapview.utils.clustering.view.ClusterRenderer;
 import com.airbnb.android.airmapview.utils.clustering.view.DefaultClusterRenderer;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 import java.util.Collection;
 import java.util.Set;
@@ -41,7 +46,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * ClusterManager should be added to the map as an: <ul> <li>{@link com.google.android.gms.maps.GoogleMap.OnCameraChangeListener}</li>
  * <li>{@link com.google.android.gms.maps.GoogleMap.OnMarkerClickListener}</li> </ul>
  */
-public class ClusterManager<T extends ClusterItem> implements GoogleMap.OnCameraChangeListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener {
+public class ClusterManager<T extends ClusterItem> implements OnCameraChangeListener, OnMapMarkerClickListener, OnInfoWindowClickListener {
     private final MarkerManager mMarkerManager;
     private final MarkerManager.Collection mMarkers;
     private final MarkerManager.Collection mClusterMarkers;
@@ -50,8 +55,8 @@ public class ClusterManager<T extends ClusterItem> implements GoogleMap.OnCamera
     private final ReadWriteLock mAlgorithmLock = new ReentrantReadWriteLock();
     private ClusterRenderer<T> mRenderer;
 
-    private GoogleMap mMap;
-    private CameraPosition mPreviousCameraPosition;
+    private AirMapView mMap;
+    private int mPreviousZoom;
     private ClusterTask mClusterTask;
     private final ReadWriteLock mClusterTaskLock = new ReentrantReadWriteLock();
 
@@ -60,17 +65,17 @@ public class ClusterManager<T extends ClusterItem> implements GoogleMap.OnCamera
     private OnClusterItemInfoWindowClickListener<T> mOnClusterItemInfoWindowClickListener;
     private OnClusterClickListener<T> mOnClusterClickListener;
 
-    public ClusterManager(Context context, GoogleMap map) {
+    public ClusterManager(Context context, AirMapView map) {
         this(context, map, new MarkerManager(map));
     }
 
-    public ClusterManager(Context context, GoogleMap map, MarkerManager markerManager) {
+    public ClusterManager(Context context, AirMapView map, MarkerManager markerManager) {
         mMap = map;
         mMarkerManager = markerManager;
         mClusterMarkers = markerManager.newCollection();
         mMarkers = markerManager.newCollection();
-        mRenderer = new DefaultClusterRenderer<T>(context, map, this);
-        mAlgorithm = new PreCachingAlgorithmDecorator<T>(new NonHierarchicalDistanceBasedAlgorithm<T>());
+        mRenderer = new DefaultClusterRenderer<>(context, map, this);
+        mAlgorithm = new PreCachingAlgorithmDecorator<>(new NonHierarchicalDistanceBasedAlgorithm<T>());
         mClusterTask = new ClusterTask();
         mRenderer.onAdd();
     }
@@ -108,7 +113,7 @@ public class ClusterManager<T extends ClusterItem> implements GoogleMap.OnCamera
             if (mAlgorithm != null) {
                 algorithm.addItems(mAlgorithm.getItems());
             }
-            mAlgorithm = new PreCachingAlgorithmDecorator<T>(algorithm);
+            mAlgorithm = new PreCachingAlgorithmDecorator<>(algorithm);
         } finally {
             mAlgorithmLock.writeLock().unlock();
         }
@@ -162,9 +167,9 @@ public class ClusterManager<T extends ClusterItem> implements GoogleMap.OnCamera
             mClusterTask.cancel(true);
             mClusterTask = new ClusterTask();
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-                mClusterTask.execute(mMap.getCameraPosition().zoom);
+                mClusterTask.execute(Float.valueOf(mMap.getZoom()));
             } else {
-                mClusterTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mMap.getCameraPosition().zoom);
+                mClusterTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (float) mMap.getZoom());
             }
         } finally {
             mClusterTaskLock.writeLock().unlock();
@@ -173,32 +178,29 @@ public class ClusterManager<T extends ClusterItem> implements GoogleMap.OnCamera
 
     /**
      * Might re-cluster.
-     *
-     * @param cameraPosition
      */
     @Override
-    public void onCameraChange(CameraPosition cameraPosition) {
-        if (mRenderer instanceof GoogleMap.OnCameraChangeListener) {
-            ((GoogleMap.OnCameraChangeListener) mRenderer).onCameraChange(cameraPosition);
+    public void onCameraChanged(LatLng latLng, int zoom) {
+        if (mRenderer instanceof OnCameraChangeListener) {
+            ((OnCameraChangeListener) mRenderer).onCameraChanged(latLng, zoom);
         }
 
         // Don't re-compute clusters if the map has just been panned/tilted/rotated.
-        CameraPosition position = mMap.getCameraPosition();
-        if (mPreviousCameraPosition != null && mPreviousCameraPosition.zoom == position.zoom) {
+        if (mPreviousZoom == zoom) {
             return;
         }
-        mPreviousCameraPosition = mMap.getCameraPosition();
+        mPreviousZoom = zoom;
 
         cluster();
     }
 
     @Override
-    public boolean onMarkerClick(Marker marker) {
-        return getMarkerManager().onMarkerClick(marker);
+    public void onMapMarkerClick(AirMapMarker marker) {
+        getMarkerManager().onMapMarkerClick(marker);
     }
 
     @Override
-    public void onInfoWindowClick(Marker marker) {
+    public void onInfoWindowClick(AirMapMarker marker) {
         getMarkerManager().onInfoWindowClick(marker);
     }
 
@@ -262,27 +264,27 @@ public class ClusterManager<T extends ClusterItem> implements GoogleMap.OnCamera
      * Called when a Cluster is clicked.
      */
     public interface OnClusterClickListener<T extends ClusterItem> {
-        public boolean onClusterClick(Cluster<T> cluster);
+        boolean onClusterClick(Cluster<T> cluster);
     }
 
     /**
      * Called when a Cluster's Info Window is clicked.
      */
     public interface OnClusterInfoWindowClickListener<T extends ClusterItem> {
-        public void onClusterInfoWindowClick(Cluster<T> cluster);
+        void onClusterInfoWindowClick(Cluster<T> cluster);
     }
 
     /**
      * Called when an individual ClusterItem is clicked.
      */
     public interface OnClusterItemClickListener<T extends ClusterItem> {
-        public boolean onClusterItemClick(T item);
+        boolean onClusterItemClick(T item);
     }
 
     /**
      * Called when an individual ClusterItem's Info Window is clicked.
      */
     public interface OnClusterItemInfoWindowClickListener<T extends ClusterItem> {
-        public void onClusterItemInfoWindowClick(T item);
+        void onClusterItemInfoWindowClick(T item);
     }
 }

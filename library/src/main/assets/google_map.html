@@ -172,6 +172,13 @@ function showDefaultInfoWindow(id){
     }
 }
 
+function moveMarker(lat, long, id) {
+  var marker = markers[id];
+  if (marker != null) {
+    marker.setPosition( new google.maps.LatLng(lat, long) );
+  }
+}
+
 function removeMarker(id) {
   var marker = markers[id];
   if (marker != null) {
