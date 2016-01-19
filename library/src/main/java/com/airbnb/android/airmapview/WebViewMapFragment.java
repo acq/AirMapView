@@ -207,7 +207,7 @@ public abstract class WebViewMapFragment extends Fragment implements AirMapInter
     setCenterZoom(latLng, zoom);
   }
 
-  public void setOnMarkerClickListener(OnMapMarkerClickListener listener) {
+  @Override public void setOnMarkerClickListener(OnMapMarkerClickListener listener) {
     onMapMarkerClickListener = listener;
   }
 

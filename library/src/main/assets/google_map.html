@@ -137,7 +137,7 @@ function addMarkerWithId(lat, lng, id, title, snippet, draggable) {
     map.panTo(marker.position);
     AirMapView.markerClick(id);
   });
-    google.maps.event.addListener(marker, 'dragstart', function() {
+  google.maps.event.addListener(marker, 'dragstart', function() {
     AirMapView.markerDragStart(id, marker.position.lat(), marker.position.lng());
   });
   google.maps.event.addListener(marker, 'drag', function() {

@@ -29,9 +29,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-import java.util.Arrays;
-
 public class DistanceDemoActivity extends BaseDemoActivity implements OnMapMarkerDragListener {
+    private static final long MARKER_A = 1L;
+    private static final long MARKER_B = 2L;
     private TextView mTextView;
     private AirMapMarker mMarkerA;
     private AirMapMarker mMarkerB;
@@ -49,9 +49,9 @@ public class DistanceDemoActivity extends BaseDemoActivity implements OnMapMarke
         getMap().animateCenterZoom(new LatLng(-33.8256, 151.2395), 10);
         getMap().setOnMarkerDragListener(this);
 
-        mMarkerA = new AirMapMarker.Builder<>(new MarkerOptions().position(new LatLng(-33.9046, 151.155)).draggable(true)).build();
+        mMarkerA = new AirMapMarker.Builder<>(new MarkerOptions().position(new LatLng(-33.9046, 151.155)).draggable(true)).id(MARKER_A).build();
         getMap().addMarker(mMarkerA);
-        mMarkerB = new AirMapMarker.Builder<>(new MarkerOptions().position(new LatLng(-33.8291, 151.248)).draggable(true)).build();
+        mMarkerB = new AirMapMarker.Builder<>(new MarkerOptions().position(new LatLng(-33.8291, 151.248)).draggable(true)).id(MARKER_B).build();
         getMap().addMarker(mMarkerB);
         mPolyline = new AirMapPolyline.Builder<>(new PolylineOptions().geodesic(true)).build();
         getMap().addPolyline(mPolyline);
@@ -101,8 +101,6 @@ public class DistanceDemoActivity extends BaseDemoActivity implements OnMapMarke
         updatePolyline();
     }
 
-
-
     @Override
     public void onMapMarkerDragStart(long id, LatLng latLng) {
 
@@ -110,12 +108,22 @@ public class DistanceDemoActivity extends BaseDemoActivity implements OnMapMarke
 
     @Override
     public void onMapMarkerDrag(long id, LatLng latLng) {
+        if (id == MARKER_A) {
+            mMarkerA.getMarkerOptions().position(latLng);
+        } else if (id == MARKER_B) {
+            mMarkerB.getMarkerOptions().position(latLng);
+        }
         showDistance();
         updatePolyline();
     }
 
     @Override
     public void onMapMarkerDragEnd(long id, LatLng latLng) {
+        if (id == MARKER_A) {
+            mMarkerA.getMarkerOptions().position(latLng);
+        } else if (id == MARKER_B) {
+            mMarkerB.getMarkerOptions().position(latLng);
+        }
         showDistance();
         updatePolyline();
     }

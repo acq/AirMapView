@@ -34,6 +34,9 @@ public class AirMapMarker<T> {
   }
 
   public LatLng getLatLng() {
+    if (marker != null) {
+      return marker.getPosition();
+    }
     return markerOptions.getPosition();
   }
 
