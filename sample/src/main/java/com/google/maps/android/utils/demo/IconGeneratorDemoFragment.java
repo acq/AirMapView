@@ -16,7 +16,7 @@
 
 package com.google.maps.android.utils.demo;
 
-public class IconGeneratorDemoActivity extends BaseDemoActivity {
+public class IconGeneratorDemoFragment extends BaseDemoFragment {
 
     @Override
     protected void startDemo() {

@@ -35,12 +35,8 @@ import com.airbnb.android.airmapview.AirMapView;
 import com.airbnb.android.airmapview.utils.SphericalUtil;
 import com.airbnb.android.airmapview.utils.heatmaps.Gradient;
 import com.airbnb.android.airmapview.utils.heatmaps.HeatmapTileProvider;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.TileOverlay;
-import com.google.android.gms.maps.model.TileOverlayOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,7 +57,7 @@ import java.util.Hashtable;
  * This demonstrates the usefulness of heatmaps for displaying the distribution of points,
  * as well as demonstrating the various color options and dealing with multiple heatmaps.
  */
-public class HeatmapsPlacesDemoActivity extends BaseDemoActivity {
+public class HeatmapsPlacesDemoFragment extends BaseDemoFragment {
 
     private AirMapView mMap = null;
 
@@ -142,7 +138,7 @@ public class HeatmapsPlacesDemoActivity extends BaseDemoActivity {
 
     @Override
     protected void startDemo() {
-        EditText editText = (EditText) findViewById(R.id.input_text);
+        EditText editText = (EditText) getView().findViewById(R.id.input_text);
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
@@ -155,7 +151,7 @@ public class HeatmapsPlacesDemoActivity extends BaseDemoActivity {
             }
         });
 
-        mCheckboxLayout = (LinearLayout) findViewById(R.id.checkboxes);
+        mCheckboxLayout = (LinearLayout) getView().findViewById(R.id.checkboxes);
         setUpMap();
     }
 
@@ -176,24 +172,24 @@ public class HeatmapsPlacesDemoActivity extends BaseDemoActivity {
      */
     public void submit() {
         if ("YOUR_KEY_HERE".equals(API_KEY)) {
-            Toast.makeText(this, "Please sign up for a Places API key and add it to HeatmapsPlacesDemoActivity.API_KEY",
+            Toast.makeText(getContext(), "Please sign up for a Places API key and add it to HeatmapsPlacesDemoActivity.API_KEY",
                 Toast.LENGTH_LONG).show();
             return;
         }
-        EditText editText = (EditText) findViewById(R.id.input_text);
+        EditText editText = (EditText) getView().findViewById(R.id.input_text);
         String keyword = editText.getText().toString();
         if (mOverlays.contains(keyword)) {
-            Toast.makeText(this, "This keyword has already been inputted :(", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "This keyword has already been inputted :(", Toast.LENGTH_SHORT).show();
         } else if (mOverlaysRendered == MAX_CHECKBOXES) {
-            Toast.makeText(this, "You can only input " + MAX_CHECKBOXES + " keywords. :(", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "You can only input " + MAX_CHECKBOXES + " keywords. :(", Toast.LENGTH_SHORT).show();
         } else if (keyword.length() != 0) {
             mOverlaysInput++;
-            ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+            ProgressBar progressBar = (ProgressBar) getView().findViewById(R.id.progress_bar);
             progressBar.setVisibility(View.VISIBLE);
             new MakeOverlayTask().execute(keyword);
             editText.setText("");
 
-            InputMethodManager imm = (InputMethodManager) getSystemService(
+            InputMethodManager imm = (InputMethodManager) getContext().getSystemService(
                     Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
         }
@@ -235,7 +231,7 @@ public class HeatmapsPlacesDemoActivity extends BaseDemoActivity {
                     }
                 }
             } catch (JSONException e) {
-                Toast.makeText(this, "Cannot process JSON results", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Cannot process JSON results", Toast.LENGTH_SHORT).show();
             }
         }
         return results.values();
@@ -270,10 +266,10 @@ public class HeatmapsPlacesDemoActivity extends BaseDemoActivity {
                 jsonResults.append(buff, 0, read);
             }
         } catch (MalformedURLException e) {
-            Toast.makeText(this, "Error processing Places API URL", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Error processing Places API URL", Toast.LENGTH_SHORT).show();
             return null;
         } catch (IOException e) {
-            Toast.makeText(this, "Error connecting to Places API", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Error connecting to Places API", Toast.LENGTH_SHORT).show();
             return null;
         } finally {
             if (conn != null) {
@@ -292,7 +288,7 @@ public class HeatmapsPlacesDemoActivity extends BaseDemoActivity {
         mCheckboxLayout.setVisibility(View.VISIBLE);
 
         // Make new checkbox
-        CheckBox checkBox = new CheckBox(this);
+        CheckBox checkBox = new CheckBox(getContext());
         checkBox.setText(keyword);
         checkBox.setTextColor(HEATMAP_COLORS[mOverlaysRendered]);
         checkBox.setChecked(true);
@@ -336,13 +332,13 @@ public class HeatmapsPlacesDemoActivity extends BaseDemoActivity {
                 }
                 mOverlaysRendered++;
                 if (mOverlaysRendered == mOverlaysInput) {
-                    ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+                    ProgressBar progressBar = (ProgressBar) getView().findViewById(R.id.progress_bar);
                     progressBar.setVisibility(View.GONE);
                 }
             } else {
-                ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+                ProgressBar progressBar = (ProgressBar) getView().findViewById(R.id.progress_bar);
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(HeatmapsPlacesDemoActivity.this, "No results for this query :(", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "No results for this query :(", Toast.LENGTH_SHORT).show();
             }
         }
     }

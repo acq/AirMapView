@@ -28,7 +28,6 @@ import com.airbnb.android.airmapview.utils.clustering.Cluster;
 import com.airbnb.android.airmapview.utils.clustering.ClusterManager;
 import com.airbnb.android.airmapview.utils.clustering.view.DefaultClusterRenderer;
 import com.airbnb.android.airmapview.utils.ui.IconGenerator;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -41,7 +40,7 @@ import java.util.Random;
 /**
  * Demonstrates heavy customisation of the look of rendered clusters.
  */
-public class CustomMarkerClusteringDemoActivity extends BaseDemoActivity implements ClusterManager.OnClusterClickListener<Person>, ClusterManager.OnClusterInfoWindowClickListener<Person>, ClusterManager.OnClusterItemClickListener<Person>, ClusterManager.OnClusterItemInfoWindowClickListener<Person> {
+public class CustomMarkerClusteringDemoFragment extends BaseDemoFragment implements ClusterManager.OnClusterClickListener<Person>, ClusterManager.OnClusterInfoWindowClickListener<Person>, ClusterManager.OnClusterItemClickListener<Person>, ClusterManager.OnClusterItemInfoWindowClickListener<Person> {
     private ClusterManager<Person> mClusterManager;
     private Random mRandom = new Random(1984);
 
@@ -50,20 +49,20 @@ public class CustomMarkerClusteringDemoActivity extends BaseDemoActivity impleme
      * When there are multiple people in the cluster, draw multiple photos (using MultiDrawable).
      */
     private class PersonRenderer extends DefaultClusterRenderer<Person> {
-        private final IconGenerator mIconGenerator = new IconGenerator(getApplicationContext());
-        private final IconGenerator mClusterIconGenerator = new IconGenerator(getApplicationContext());
+        private final IconGenerator mIconGenerator = new IconGenerator(getContext());
+        private final IconGenerator mClusterIconGenerator = new IconGenerator(getContext());
         private final ImageView mImageView;
         private final ImageView mClusterImageView;
         private final int mDimension;
 
         public PersonRenderer() {
-            super(getApplicationContext(), getMap(), mClusterManager);
+            super(getContext(), getMap(), mClusterManager);
 
-            View multiProfile = getLayoutInflater().inflate(R.layout.multi_profile, null);
+            View multiProfile = getActivity().getLayoutInflater().inflate(R.layout.multi_profile, null);
             mClusterIconGenerator.setContentView(multiProfile);
             mClusterImageView = (ImageView) multiProfile.findViewById(R.id.image);
 
-            mImageView = new ImageView(getApplicationContext());
+            mImageView = new ImageView(getContext());
             mDimension = (int) getResources().getDimension(R.dimen.custom_profile_image);
             mImageView.setLayoutParams(new ViewGroup.LayoutParams(mDimension, mDimension));
             int padding = (int) getResources().getDimension(R.dimen.custom_profile_padding);
@@ -84,7 +83,7 @@ public class CustomMarkerClusteringDemoActivity extends BaseDemoActivity impleme
         protected void onBeforeClusterRendered(Cluster<Person> cluster, MarkerOptions markerOptions) {
             // Draw multiple people.
             // Note: this method runs on the UI thread. Don't spend too much time in here (like in this example).
-            List<Drawable> profilePhotos = new ArrayList<Drawable>(Math.min(4, cluster.getSize()));
+            List<Drawable> profilePhotos = new ArrayList<>(Math.min(4, cluster.getSize()));
             int width = mDimension;
             int height = mDimension;
 
@@ -114,7 +113,7 @@ public class CustomMarkerClusteringDemoActivity extends BaseDemoActivity impleme
     public boolean onClusterClick(Cluster<Person> cluster) {
         // Show a toast with some info when the cluster is clicked.
         String firstName = cluster.getItems().iterator().next().name;
-        Toast.makeText(this, cluster.getSize() + " (including " + firstName + ")", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), cluster.getSize() + " (including " + firstName + ")", Toast.LENGTH_SHORT).show();
         return true;
     }
 
@@ -138,7 +137,7 @@ public class CustomMarkerClusteringDemoActivity extends BaseDemoActivity impleme
     protected void startDemo() {
         getMap().animateCenterZoom(new LatLng(51.503186, -0.126446), 9);
 
-        mClusterManager = new ClusterManager<Person>(this, getMap());
+        mClusterManager = new ClusterManager<>(getContext(), getMap());
         mClusterManager.setRenderer(new PersonRenderer());
         getMap().setOnCameraChangeListener(mClusterManager);
         getMap().setOnMarkerClickListener(mClusterManager);

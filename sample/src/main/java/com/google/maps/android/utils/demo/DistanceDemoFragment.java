@@ -29,7 +29,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-public class DistanceDemoActivity extends BaseDemoActivity implements OnMapMarkerDragListener {
+public class DistanceDemoFragment extends BaseDemoFragment implements OnMapMarkerDragListener {
     private static final long MARKER_A = 1L;
     private static final long MARKER_B = 2L;
     private TextView mTextView;
@@ -44,7 +44,7 @@ public class DistanceDemoActivity extends BaseDemoActivity implements OnMapMarke
 
     @Override
     protected void startDemo() {
-        mTextView = (TextView) findViewById(R.id.textView);
+        mTextView = (TextView) getView().findViewById(R.id.textView);
 
         getMap().animateCenterZoom(new LatLng(-33.8256, 151.2395), 10);
         getMap().setOnMarkerDragListener(this);
@@ -56,7 +56,7 @@ public class DistanceDemoActivity extends BaseDemoActivity implements OnMapMarke
         mPolyline = new AirMapPolyline.Builder<>(new PolylineOptions().geodesic(true)).build();
         getMap().addPolyline(mPolyline);
 
-        Toast.makeText(this, "Drag the markers!", Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), "Drag the markers!", Toast.LENGTH_LONG).show();
         showDistance();
     }
 

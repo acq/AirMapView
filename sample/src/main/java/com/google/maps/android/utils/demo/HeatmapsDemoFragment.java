@@ -29,10 +29,8 @@ import android.widget.Toast;
 import com.airbnb.airmapview.sample.R;
 import com.airbnb.android.airmapview.utils.heatmaps.Gradient;
 import com.airbnb.android.airmapview.utils.heatmaps.HeatmapTileProvider;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.TileOverlay;
-import com.google.android.gms.maps.model.TileOverlayOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,7 +46,7 @@ import java.util.Scanner;
  * a colored map overlay that visualises many points of weighted importance/intensity, with
  * different colors representing areas of high and low concentration/combined intensity of points.
  */
-public class HeatmapsDemoActivity extends BaseDemoActivity {
+public class HeatmapsDemoFragment extends BaseDemoFragment {
 
     /**
      * Alternative radius for convolution
@@ -90,7 +88,7 @@ public class HeatmapsDemoActivity extends BaseDemoActivity {
      * Maps name of data set to data (list of LatLngs)
      * Also maps to the URL of the data set for attribution
      */
-    private HashMap<String, DataSet> mLists = new HashMap<String, DataSet>();
+    private HashMap<String, DataSet> mLists = new HashMap<>();
 
     @Override
     protected int getLayoutId() {
@@ -102,8 +100,8 @@ public class HeatmapsDemoActivity extends BaseDemoActivity {
         getMap().animateCenterZoom(new LatLng(-25, 143), 4);
 
         // Set up the spinner/dropdown list
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+        Spinner spinner = (Spinner) getView().findViewById(R.id.spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.heatmaps_datasets_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
@@ -115,7 +113,7 @@ public class HeatmapsDemoActivity extends BaseDemoActivity {
             mLists.put(getString(R.string.medicare), new DataSet(readItems(R.raw.medicare),
                     getString(R.string.medicare_url)));
         } catch (JSONException e) {
-            Toast.makeText(this, "Problem reading list of markers.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Problem reading list of markers.", Toast.LENGTH_LONG).show();
         }
 
         // Make the handler deal with the map
@@ -160,7 +158,7 @@ public class HeatmapsDemoActivity extends BaseDemoActivity {
                                    int pos, long id) {
             String dataset = parent.getItemAtPosition(pos).toString();
 
-            TextView attribution = ((TextView) findViewById(R.id.attribution));
+            TextView attribution = ((TextView) getView().findViewById(R.id.attribution));
 
             // Check if need to instantiate (avoid setData etc twice)
             if (mProvider == null) {
@@ -186,7 +184,7 @@ public class HeatmapsDemoActivity extends BaseDemoActivity {
 
     // Datasets from http://data.gov.au
     private ArrayList<LatLng> readItems(int resource) throws JSONException {
-        ArrayList<LatLng> list = new ArrayList<LatLng>();
+        ArrayList<LatLng> list = new ArrayList<>();
         InputStream inputStream = getResources().openRawResource(resource);
         String json = new Scanner(inputStream).useDelimiter("\\A").next();
         JSONArray array = new JSONArray(json);

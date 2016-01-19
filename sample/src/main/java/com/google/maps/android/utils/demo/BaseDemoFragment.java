@@ -17,7 +17,11 @@
 package com.google.maps.android.utils.demo;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.airbnb.airmapview.sample.R;
 import com.airbnb.android.airmapview.AirMapInterface;
@@ -26,31 +30,30 @@ import com.airbnb.android.airmapview.AirMapViewTypes;
 import com.airbnb.android.airmapview.DefaultAirMapViewBuilder;
 import com.airbnb.android.airmapview.listeners.OnMapInitializedListener;
 
-public abstract class BaseDemoActivity extends FragmentActivity {
+public abstract class BaseDemoFragment extends Fragment {
   private AirMapView mMap;
 
   protected int getLayoutId() {
     return R.layout.map;
   }
 
+  @Nullable
   @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(getLayoutId());
-    setUpMapIfNeeded();
+  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    return inflater.inflate(getLayoutId(), container, false);
   }
 
   @Override
-  protected void onResume() {
+  public void onResume() {
     super.onResume();
     setUpMapIfNeeded();
   }
 
   private void setUpMapIfNeeded() {
-    if (mMap != null) {
+    if (mMap != null || getView() == null) {
       return;
     }
-    mMap = (AirMapView) findViewById(R.id.map);
+    mMap = (AirMapView) getView().findViewById(R.id.map);
     if (mMap != null) {
       mMap.setOnMapInitializedListener(new OnMapInitializedListener() {
         @Override
@@ -58,11 +61,10 @@ public abstract class BaseDemoActivity extends FragmentActivity {
           startDemo();
         }
       });
-      DefaultAirMapViewBuilder mapViewBuilder = new DefaultAirMapViewBuilder(this);
-      AirMapInterface airMapInterface = null;
-      airMapInterface = mapViewBuilder.builder(AirMapViewTypes.NATIVE).build();
+      DefaultAirMapViewBuilder mapViewBuilder = new DefaultAirMapViewBuilder(getActivity());
+      AirMapInterface airMapInterface = mapViewBuilder.builder(AirMapViewTypes.NATIVE).build();
       if (airMapInterface != null) {
-        mMap.initialize(getSupportFragmentManager(), airMapInterface);
+        mMap.initialize(getChildFragmentManager(), airMapInterface);
       }
     }
   }

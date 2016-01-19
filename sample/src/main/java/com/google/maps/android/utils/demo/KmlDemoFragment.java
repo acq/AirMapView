@@ -4,28 +4,22 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.airbnb.airmapview.sample.R;
-import com.airbnb.android.airmapview.AirMapMarker;
-import com.airbnb.android.airmapview.AirMapView;
 import com.airbnb.android.airmapview.utils.kml.KmlContainer;
 import com.airbnb.android.airmapview.utils.kml.KmlLayer;
 import com.airbnb.android.airmapview.utils.kml.KmlPlacemark;
 import com.airbnb.android.airmapview.utils.kml.KmlPolygon;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-public class KmlDemoActivity extends BaseDemoActivity {
+public class KmlDemoFragment extends BaseDemoFragment {
 
-    private AirMapView mMap;
     private KmlLayer kmlLayer;
 
     protected int getLayoutId() {
@@ -34,7 +28,6 @@ public class KmlDemoActivity extends BaseDemoActivity {
 
     public void startDemo () {
         try {
-            mMap = getMap();
             //retrieveFileFromResource();
             retrieveFileFromUrl();
         } catch (Exception e) {
@@ -106,9 +99,7 @@ public class KmlDemoActivity extends BaseDemoActivity {
 //                        getApplicationContext());
                 kmlLayer.addLayerToMap();
                 moveCameraToKml(kmlLayer);
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (XmlPullParserException | IOException e) {
                 e.printStackTrace();
             }
         }

@@ -16,54 +16,94 @@
 
 package com.google.maps.android.utils.demo;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.airbnb.airmapview.sample.R;
 
-public class MainActivity extends Activity implements View.OnClickListener {
-    private ViewGroup mListView;
+import java.util.ArrayList;
+import java.util.List;
 
-    //Comment to see if I can push to the repository
+public class MainActivity extends AppCompatActivity implements OnItemClickListener {
+    private DemoAdapter mDemoAdapter = new DemoAdapter();
+    private List<Demo> mDemos = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.activity_main);
 
-        mListView = (ViewGroup) findViewById(R.id.list);
+        ListView listView = (ListView) findViewById(android.R.id.list);
+        listView.setAdapter(mDemoAdapter);
+        listView.setOnItemClickListener(this);
 
-        addDemo("Clustering", ClusteringDemoActivity.class);
-        addDemo("Clustering: Custom Look", CustomMarkerClusteringDemoActivity.class);
-        addDemo("Clustering: 2K markers", BigClusteringDemoActivity.class);
-        addDemo("PolyUtil.decode", PolyDecodeDemoActivity.class);
-        addDemo("PolyUtil.simplify", PolySimplifyDemoActivity.class);
-        addDemo("IconGenerator", IconGeneratorDemoActivity.class);
-        addDemo("SphericalUtil.computeDistanceBetween", DistanceDemoActivity.class);
-        addDemo("Generating tiles", TileProviderAndProjectionDemo.class);
-        addDemo("Heatmaps", HeatmapsDemoActivity.class);
-        addDemo("Heatmaps with Places API", HeatmapsPlacesDemoActivity.class);
-        addDemo("GeoJSON Layer", GeoJsonDemoActivity.class);
-        addDemo("KML Layer Overlay", KmlDemoActivity.class);
+        addDemo("Clustering", new ClusteringDemoFragment());
+        addDemo("Clustering: Custom Look", new CustomMarkerClusteringDemoFragment());
+        addDemo("Clustering: 2K markers", new BigClusteringDemoFragment());
+        addDemo("PolyUtil.decode", new PolyDecodeDemoFragment());
+        addDemo("PolyUtil.simplify", new PolySimplifyDemoFragment());
+        addDemo("IconGenerator", new IconGeneratorDemoFragment());
+        addDemo("SphericalUtil.computeDistanceBetween", new DistanceDemoFragment());
+        addDemo("Generating tiles", new TileProviderAndProjectionDemo());
+        addDemo("Heatmaps", new HeatmapsDemoFragment());
+        addDemo("Heatmaps with Places API", new HeatmapsPlacesDemoFragment());
+        addDemo("GeoJSON Layer", new GeoJsonDemoFragment());
+        addDemo("KML Layer Overlay", new KmlDemoFragment());
     }
 
-    private void addDemo(String demoName, Class<? extends Activity> activityClass) {
-        Button b = new Button(this);
-        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        b.setLayoutParams(layoutParams);
-        b.setText(demoName);
-        b.setTag(activityClass);
-        b.setOnClickListener(this);
-        mListView.addView(b);
+    private void addDemo(String demoName, Fragment fragment) {
+        mDemos.add(new Demo(demoName, fragment));
     }
 
     @Override
-    public void onClick(View view) {
-        Class activityClass = (Class) view.getTag();
-        startActivity(new Intent(this, activityClass));
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Demo demo = mDemoAdapter.getItem(position);
+        getSupportFragmentManager().beginTransaction().replace(R.id.content, demo.fragment).commit();
+    }
+
+    private class DemoAdapter extends BaseAdapter {
+        @Override
+        public int getCount() {
+            return mDemos.size();
+        }
+
+        @Override
+        public Demo getItem(int position) {
+            return mDemos.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = getLayoutInflater().inflate(android.R.layout.simple_list_item_1, parent, false);
+            }
+            Demo demo = getItem(position);
+            ((TextView)convertView.findViewById(android.R.id.text1)).setText(demo.demoName);
+            return convertView;
+        }
+    }
+
+    private static class Demo {
+        private final String demoName;
+        private final Fragment fragment;
+
+        public Demo(String demoName, Fragment fragment) {
+            this.demoName = demoName;
+            this.fragment = fragment;
+        }
     }
 }

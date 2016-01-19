@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 import com.airbnb.airmapview.sample.R;
 import com.airbnb.android.airmapview.utils.clustering.ClusterManager;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.utils.demo.model.MyItem;
 
@@ -29,20 +28,20 @@ import org.json.JSONException;
 import java.io.InputStream;
 import java.util.List;
 
-public class BigClusteringDemoActivity extends BaseDemoActivity {
+public class BigClusteringDemoFragment extends BaseDemoFragment {
     private ClusterManager<MyItem> mClusterManager;
 
     @Override
     protected void startDemo() {
         getMap().animateCenterZoom(new LatLng(51.503186, -0.126446), 10);
 
-        mClusterManager = new ClusterManager<MyItem>(this, getMap());
+        mClusterManager = new ClusterManager<>(getContext(), getMap());
 
         getMap().setOnCameraChangeListener(mClusterManager);
         try {
             readItems();
         } catch (JSONException e) {
-            Toast.makeText(this, "Problem reading list of markers.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Problem reading list of markers.", Toast.LENGTH_LONG).show();
         }
     }
 

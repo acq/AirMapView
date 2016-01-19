@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 
-public class GeoJsonDemoActivity extends BaseDemoActivity {
+public class GeoJsonDemoFragment extends BaseDemoFragment {
 
     private final static String mLogTag = "GeoJsonDemo";
 
@@ -49,7 +49,7 @@ public class GeoJsonDemoActivity extends BaseDemoActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MapsInitializer.initialize(this);
+        MapsInitializer.initialize(getContext());
     }
 
     protected int getLayoutId() {

@@ -32,7 +32,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TileProviderAndProjectionDemo extends BaseDemoActivity {
+public class TileProviderAndProjectionDemo extends BaseDemoFragment {
     @Override
     protected void startDemo() {
         PointTileOverlay pto = new PointTileOverlay();

@@ -43,18 +43,18 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.google.maps.android.utils.demo.PolyDecodeDemoActivity"/>
-        <activity android:name="com.google.maps.android.utils.demo.PolySimplifyDemoActivity"/>
-        <activity android:name="com.google.maps.android.utils.demo.IconGeneratorDemoActivity"/>
-        <activity android:name="com.google.maps.android.utils.demo.DistanceDemoActivity"/>
-        <activity android:name="com.google.maps.android.utils.demo.ClusteringDemoActivity"/>
-        <activity android:name="com.google.maps.android.utils.demo.BigClusteringDemoActivity"/>
-        <activity android:name="com.google.maps.android.utils.demo.CustomMarkerClusteringDemoActivity"/>
+        <activity android:name="com.google.maps.android.utils.demo.PolyDecodeDemoFragment"/>
+        <activity android:name="com.google.maps.android.utils.demo.PolySimplifyDemoFragment"/>
+        <activity android:name="com.google.maps.android.utils.demo.IconGeneratorDemoFragment"/>
+        <activity android:name="com.google.maps.android.utils.demo.DistanceDemoFragment"/>
+        <activity android:name="com.google.maps.android.utils.demo.ClusteringDemoFragment"/>
+        <activity android:name="com.google.maps.android.utils.demo.BigClusteringDemoFragment"/>
+        <activity android:name="com.google.maps.android.utils.demo.CustomMarkerClusteringDemoFragment"/>
         <activity android:name="com.google.maps.android.utils.demo.TileProviderAndProjectionDemo"/>
-        <activity android:name="com.google.maps.android.utils.demo.HeatmapsDemoActivity"/>
+        <activity android:name="com.google.maps.android.utils.demo.HeatmapsDemoFragment"/>
         <activity android:name="com.google.maps.android.utils.demo.HeatmapsPlacesDemoActivity"/>
-        <activity android:name="com.google.maps.android.utils.demo.GeoJsonDemoActivity"/>
-        <activity android:name="com.google.maps.android.utils.demo.KmlDemoActivity"/>
+        <activity android:name="com.google.maps.android.utils.demo.GeoJsonDemoFragment"/>
+        <activity android:name="com.google.maps.android.utils.demo.KmlDemoFragment"/>
 
         <!--
             DISCLAIMER: The Map Provider API Keys below are for test purposes, therefore not intended
