@@ -24,15 +24,6 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <!--<activity-->
-            <!--android:name=".MainActivity"-->
-            <!--android:label="@string/app_name" >-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
 
         <activity
             android:name="com.google.maps.android.utils.demo.MainActivity"
@@ -42,19 +33,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <activity android:name="com.google.maps.android.utils.demo.PolyDecodeDemoFragment"/>
-        <activity android:name="com.google.maps.android.utils.demo.PolySimplifyDemoFragment"/>
-        <activity android:name="com.google.maps.android.utils.demo.IconGeneratorDemoFragment"/>
-        <activity android:name="com.google.maps.android.utils.demo.DistanceDemoFragment"/>
-        <activity android:name="com.google.maps.android.utils.demo.ClusteringDemoFragment"/>
-        <activity android:name="com.google.maps.android.utils.demo.BigClusteringDemoFragment"/>
-        <activity android:name="com.google.maps.android.utils.demo.CustomMarkerClusteringDemoFragment"/>
-        <activity android:name="com.google.maps.android.utils.demo.TileProviderAndProjectionDemo"/>
-        <activity android:name="com.google.maps.android.utils.demo.HeatmapsDemoFragment"/>
-        <activity android:name="com.google.maps.android.utils.demo.HeatmapsPlacesDemoActivity"/>
-        <activity android:name="com.google.maps.android.utils.demo.GeoJsonDemoFragment"/>
-        <activity android:name="com.google.maps.android.utils.demo.KmlDemoFragment"/>
 
         <!--
             DISCLAIMER: The Map Provider API Keys below are for test purposes, therefore not intended
