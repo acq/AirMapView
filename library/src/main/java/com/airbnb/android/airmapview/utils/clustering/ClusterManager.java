@@ -31,7 +31,6 @@ import com.airbnb.android.airmapview.utils.clustering.algo.NonHierarchicalDistan
 import com.airbnb.android.airmapview.utils.clustering.algo.PreCachingAlgorithmDecorator;
 import com.airbnb.android.airmapview.utils.clustering.view.ClusterRenderer;
 import com.airbnb.android.airmapview.utils.clustering.view.DefaultClusterRenderer;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 

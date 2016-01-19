@@ -24,15 +24,37 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <!--<activity-->
+            <!--android:name=".MainActivity"-->
+            <!--android:label="@string/app_name" >-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+
+        <activity
+            android:name="com.google.maps.android.utils.demo.MainActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity android:name="com.google.maps.android.utils.demo.PolyDecodeDemoActivity"/>
+        <activity android:name="com.google.maps.android.utils.demo.PolySimplifyDemoActivity"/>
+        <activity android:name="com.google.maps.android.utils.demo.IconGeneratorDemoActivity"/>
+        <activity android:name="com.google.maps.android.utils.demo.DistanceDemoActivity"/>
+        <activity android:name="com.google.maps.android.utils.demo.ClusteringDemoActivity"/>
+        <activity android:name="com.google.maps.android.utils.demo.BigClusteringDemoActivity"/>
+        <activity android:name="com.google.maps.android.utils.demo.CustomMarkerClusteringDemoActivity"/>
+        <activity android:name="com.google.maps.android.utils.demo.TileProviderAndProjectionDemo"/>
+        <activity android:name="com.google.maps.android.utils.demo.HeatmapsDemoActivity"/>
+        <activity android:name="com.google.maps.android.utils.demo.HeatmapsPlacesDemoActivity"/>
+        <activity android:name="com.google.maps.android.utils.demo.GeoJsonDemoActivity"/>
+        <activity android:name="com.google.maps.android.utils.demo.KmlDemoActivity"/>
 
         <!--
             DISCLAIMER: The Map Provider API Keys below are for test purposes, therefore not intended
