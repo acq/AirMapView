@@ -247,6 +247,9 @@ public abstract class WebViewMapFragment extends Fragment implements AirMapInter
   }
 
   @Override public <T> void addPolyline(AirMapPolyline<T> polyline) {
+    if (polyline.getPoints() == null) {
+      return;
+    }
     try {
       JSONArray array = new JSONArray();
       for (LatLng point : polyline.getPoints()) {

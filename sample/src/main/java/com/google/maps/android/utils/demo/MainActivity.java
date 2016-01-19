@@ -16,10 +16,13 @@
 
 package com.google.maps.android.utils.demo;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -36,16 +39,26 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements OnItemClickListener {
     private DemoAdapter mDemoAdapter = new DemoAdapter();
     private List<Demo> mDemos = new ArrayList<>();
+    private ListView mListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ListView listView = (ListView) findViewById(android.R.id.list);
-        listView.setAdapter(mDemoAdapter);
-        listView.setOnItemClickListener(this);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
+        drawerLayout.setDrawerListener(drawerToggle);
+        drawerToggle.syncState();
 
+        mListView = (ListView) findViewById(android.R.id.list);
+        mListView.setAdapter(mDemoAdapter);
+        mListView.setOnItemClickListener(this);
+
+        DefaultDemoFragment defaultDemoFragment = new DefaultDemoFragment();
+        addDemo("Default", defaultDemoFragment);
         addDemo("Clustering", new ClusteringDemoFragment());
         addDemo("Clustering: Custom Look", new CustomMarkerClusteringDemoFragment());
         addDemo("Clustering: 2K markers", new BigClusteringDemoFragment());
@@ -58,6 +71,18 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         addDemo("Heatmaps with Places API", new HeatmapsPlacesDemoFragment());
         addDemo("GeoJSON Layer", new GeoJsonDemoFragment());
         addDemo("KML Layer Overlay", new KmlDemoFragment());
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.content, defaultDemoFragment).commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void addDemo(String demoName, Fragment fragment) {
@@ -68,6 +93,8 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Demo demo = mDemoAdapter.getItem(position);
         getSupportFragmentManager().beginTransaction().replace(R.id.content, demo.fragment).commit();
+        mListView.setSelection(position);
+        ((DrawerLayout) findViewById(R.id.drawer_layout)).closeDrawer(GravityCompat.START);
     }
 
     private class DemoAdapter extends BaseAdapter {
