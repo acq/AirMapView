@@ -81,10 +81,6 @@ function addMarker(lat, lng) {
   markers.push(marker);
 }
 
-function addMarkerWithId(lat, lng, id, title, snippet) {
-  addMarkerWithId(lat, lng, id, title, snippet, false);
-}
-
 function addMarkerWithId(lat, lng, id, title, snippet, draggable) {
   var marker = L.marker(new L.LatLng(lat, lng), {
       icon: L.mapbox.marker.icon({

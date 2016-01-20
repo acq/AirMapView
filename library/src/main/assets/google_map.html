@@ -107,10 +107,6 @@ function addMarker(lat, lng) {
   });
 }
 
-function addMarkerWithId(lat, lng, id, title, snippet) {
-  addMarkerWithId(lat, lng, id, title, snippet, false);
-}
-
 function addMarkerWithId(lat, lng, id, title, snippet, draggable) {
   var position = new google.maps.LatLng(lat, lng);
   var marker = new google.maps.Marker({
