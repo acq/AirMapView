@@ -16,15 +16,12 @@ import java.util.List;
  */
 public class AirMapPolyline<T> {
 
-  private static final int STROKE_WIDTH = 1;
+  private static final int STROKE_WIDTH = 5;
   private static final int STROKE_COLOR = Color.BLUE;
 
   private T object;
-  private int strokeWidth;
   private long id;
-  private List<LatLng> points;
   private String title;
-  private int strokeColor;
   private final PolylineOptions polylineOptions;
   private Polyline googlePolyline;
 
@@ -38,10 +35,7 @@ public class AirMapPolyline<T> {
 
   public AirMapPolyline(T object, List<LatLng> points, long id, int strokeWidth, int strokeColor) {
     this.object = object;
-    this.points = points;
     this.id = id;
-    this.strokeWidth = strokeWidth;
-    this.strokeColor = strokeColor;
     polylineOptions = new PolylineOptions().addAll(points).width(strokeWidth).color(strokeColor);
   }
 
@@ -60,7 +54,7 @@ public class AirMapPolyline<T> {
   }
 
   public List<LatLng> getPoints() {
-    return points;
+    return polylineOptions.getPoints();
   }
 
   public String getTitle() {
@@ -72,11 +66,11 @@ public class AirMapPolyline<T> {
   }
 
   public int getStrokeWidth() {
-    return strokeWidth;
+    return (int) polylineOptions.getWidth();
   }
 
   public int getStrokeColor() {
-    return strokeColor;
+    return polylineOptions.getColor();
   }
 
   /**
@@ -110,7 +104,7 @@ public class AirMapPolyline<T> {
     private long id;
 
     public Builder() {
-      polylineOptions = new PolylineOptions();
+      polylineOptions = new PolylineOptions().color(STROKE_COLOR).width(STROKE_WIDTH);
     }
 
     public Builder(PolylineOptions polylineOptions) {
@@ -153,7 +147,7 @@ public class AirMapPolyline<T> {
     }
 
     public AirMapPolyline<T> build() {
-      return new AirMapPolyline<T>(object, id, polylineOptions);
+      return new AirMapPolyline<>(object, id, polylineOptions);
     }
   }
 }

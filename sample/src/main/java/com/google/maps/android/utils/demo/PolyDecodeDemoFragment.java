@@ -32,7 +32,7 @@ public class PolyDecodeDemoFragment extends BaseDemoFragment {
     protected void startDemo() {
         List<LatLng> decodedPath = PolyUtil.decode(LINE);
 
-        getMap().addPolyline(new AirMapPolyline.Builder<>(new PolylineOptions().addAll(decodedPath)).build());
+        getMap().addPolyline(new AirMapPolyline.Builder<>().addAll(decodedPath).build());
 
         getMap().animateCenterZoom(new LatLng(-33.8256, 151.2395), 12);
     }

@@ -41,9 +41,9 @@ public class PolySimplifyDemoFragment extends BaseDemoFragment {
 
         // Original line
         List<LatLng> line = PolyUtil.decode(LINE);
-        mMap.addPolyline(new AirMapPolyline.Builder<>(new PolylineOptions()
+        mMap.addPolyline(new AirMapPolyline.Builder<>()
                 .addAll(line)
-                .color(Color.BLACK)).build());
+                .strokeColor(Color.BLACK).build());
 
         getMap().animateCenterZoom(new LatLng(28.05870, -82.4090), 15);
 
@@ -55,33 +55,33 @@ public class PolySimplifyDemoFragment extends BaseDemoFragment {
          */
         double tolerance = 5; // meters
         simplifiedLine = PolyUtil.simplify(line, tolerance);
-        mMap.addPolyline(new AirMapPolyline.Builder<>(new PolylineOptions()
+        mMap.addPolyline(new AirMapPolyline.Builder<>()
                 .addAll(simplifiedLine)
-                .color(Color.RED - ALPHA_ADJUSTMENT)).build());
+                .strokeColor(Color.RED - ALPHA_ADJUSTMENT).build());
 
         tolerance = 20; // meters
         simplifiedLine = PolyUtil.simplify(line, tolerance);
-        mMap.addPolyline(new AirMapPolyline.Builder<>(new PolylineOptions()
+        mMap.addPolyline(new AirMapPolyline.Builder<>()
                 .addAll(simplifiedLine)
-                .color(Color.GREEN - ALPHA_ADJUSTMENT)).build());
+                .strokeColor(Color.GREEN - ALPHA_ADJUSTMENT).build());
 
         tolerance = 50; // meters
         simplifiedLine = PolyUtil.simplify(line, tolerance);
-        mMap.addPolyline(new AirMapPolyline.Builder<>(new PolylineOptions()
+        mMap.addPolyline(new AirMapPolyline.Builder<>()
                 .addAll(simplifiedLine)
-                .color(Color.MAGENTA - ALPHA_ADJUSTMENT)).build());
+                .strokeColor(Color.MAGENTA - ALPHA_ADJUSTMENT).build());
 
         tolerance = 500; // meters
         simplifiedLine = PolyUtil.simplify(line, tolerance);
-        mMap.addPolyline(new AirMapPolyline.Builder<>(new PolylineOptions()
+        mMap.addPolyline(new AirMapPolyline.Builder<>()
                 .addAll(simplifiedLine)
-                .color(Color.YELLOW - ALPHA_ADJUSTMENT)).build());
+                .strokeColor(Color.YELLOW - ALPHA_ADJUSTMENT).build());
 
         tolerance = 1000; // meters
         simplifiedLine = PolyUtil.simplify(line, tolerance);
-        mMap.addPolyline(new AirMapPolyline.Builder<>(new PolylineOptions()
+        mMap.addPolyline(new AirMapPolyline.Builder<>()
                 .addAll(simplifiedLine)
-                .color(Color.BLUE - ALPHA_ADJUSTMENT)).build());
+                .strokeColor(Color.BLUE - ALPHA_ADJUSTMENT).build());
 
 
         // Triangle polygon - the polygon should be closed

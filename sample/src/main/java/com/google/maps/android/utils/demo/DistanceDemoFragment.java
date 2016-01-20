@@ -53,7 +53,7 @@ public class DistanceDemoFragment extends BaseDemoFragment implements OnMapMarke
         getMap().addMarker(mMarkerA);
         mMarkerB = new AirMapMarker.Builder<>(new MarkerOptions().position(new LatLng(-33.8291, 151.248)).draggable(true)).id(MARKER_B).build();
         getMap().addMarker(mMarkerB);
-        mPolyline = new AirMapPolyline.Builder<>(new PolylineOptions().geodesic(true)).build();
+        mPolyline = new AirMapPolyline.Builder<>().build();
         getMap().addPolyline(mPolyline);
 
         Toast.makeText(getContext(), "Drag the markers!", Toast.LENGTH_LONG).show();
@@ -67,7 +67,7 @@ public class DistanceDemoFragment extends BaseDemoFragment implements OnMapMarke
 
     private void updatePolyline() {
         getMap().removePolyline(mPolyline);
-        mPolyline = new AirMapPolyline.Builder<>(new PolylineOptions().geodesic(true).add(mMarkerA.getLatLng()).add(mMarkerB.getLatLng())).build();
+        mPolyline = new AirMapPolyline.Builder<>().add(mMarkerA.getLatLng()).add(mMarkerB.getLatLng()).build();
         getMap().addPolyline(mPolyline);
     }
 
