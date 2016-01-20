@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.airbnb.airmapview.sample.R;
+import com.airbnb.android.airmapview.AirMapMarker;
 import com.airbnb.android.airmapview.utils.clustering.Cluster;
 import com.airbnb.android.airmapview.utils.clustering.ClusterManager;
 import com.airbnb.android.airmapview.utils.clustering.view.DefaultClusterRenderer;
@@ -71,16 +72,16 @@ public class CustomMarkerClusteringDemoFragment extends BaseDemoFragment impleme
         }
 
         @Override
-        protected void onBeforeClusterItemRendered(Person person, MarkerOptions markerOptions) {
+        protected void onBeforeClusterItemRendered(Person person, AirMapMarker.Builder builder) {
             // Draw a single person.
             // Set the info window to show their name.
             mImageView.setImageResource(person.profilePhoto);
             Bitmap icon = mIconGenerator.makeIcon();
-            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon)).title(person.name);
+            builder.bitmap(icon).title(person.name);
         }
 
         @Override
-        protected void onBeforeClusterRendered(Cluster<Person> cluster, MarkerOptions markerOptions) {
+        protected void onBeforeClusterRendered(Cluster<Person> cluster, AirMapMarker.Builder builder) {
             // Draw multiple people.
             // Note: this method runs on the UI thread. Don't spend too much time in here (like in this example).
             List<Drawable> profilePhotos = new ArrayList<>(Math.min(4, cluster.getSize()));
@@ -99,7 +100,7 @@ public class CustomMarkerClusteringDemoFragment extends BaseDemoFragment impleme
 
             mClusterImageView.setImageDrawable(multiDrawable);
             Bitmap icon = mClusterIconGenerator.makeIcon(String.valueOf(cluster.getSize()));
-            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
+            builder.bitmap(icon);
         }
 
         @Override

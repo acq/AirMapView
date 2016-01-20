@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +38,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.io.ByteArrayOutputStream;
 import java.util.Locale;
 import java.util.Map;
 
@@ -167,7 +169,31 @@ public abstract class WebViewMapFragment extends Fragment implements AirMapInter
         String.format(Locale.US,
             "javascript:addMarkerWithId(%1$f, %2$f, %3$d, '%4$s', '%5$s', %6$b);",
             latLng.latitude, latLng.longitude, marker.getId(), marker.getTitle(),
-            marker.getSnippet(), marker.getMarkerOptions().isDraggable()));
+            marker.getSnippet(), marker.getMarkerOptions().isDraggable(), markerImage(marker)));
+  }
+
+  private String markerImage(AirMapMarker marker) {
+    Bitmap icon = marker.getIcon(getContext().getResources());
+    if (icon != null) {
+      return bitmapToBase64String(icon);
+    } else if (marker.getBitmap() != null) {
+      return bitmapToBase64String(marker.getBitmap());
+    }
+    return null;
+  }
+
+  private String bitmapToBase64String(Bitmap bitmap) {
+    float scaleFactor = getResources().getDisplayMetrics().density;
+
+    int newWidth = (int) (bitmap.getWidth() / scaleFactor);
+    int newHeight = (int) (bitmap.getHeight() / scaleFactor);
+    Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, false);
+
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    scaledBitmap.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
+    byte[] byteArray = byteArrayOutputStream.toByteArray();
+    String imgageBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+    return "data:image/png;base64," + imgageBase64;
   }
 
   @Override public void moveMarker(AirMapMarker<?> marker, LatLng to) {

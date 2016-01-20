@@ -189,8 +189,7 @@ public class MarkerManager implements OnInfoWindowClickListener, OnMapMarkerClic
         public Collection() {
         }
 
-        public AirMapMarker addMarker(MarkerOptions opts) {
-            AirMapMarker marker = new AirMapMarker.Builder<>(opts).build();
+        public AirMapMarker addMarker(AirMapMarker marker) {
             mMap.addMarker(marker);
             mMarkers.add(marker);
             mAllMarkers.put(marker, Collection.this);

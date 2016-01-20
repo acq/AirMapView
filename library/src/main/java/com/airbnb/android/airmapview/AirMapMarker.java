@@ -1,6 +1,8 @@
 package com.airbnb.android.airmapview;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -18,6 +20,8 @@ public class AirMapMarker<T> {
   private final long id;
   private final MarkerOptions markerOptions;
   private Marker marker;
+  private int iconId;
+  private Bitmap bitmap;
 
   private AirMapMarker(T object, long id, MarkerOptions markerOptions) {
     this.object = object;
@@ -83,9 +87,22 @@ public class AirMapMarker<T> {
     return marker;
   }
 
+  public Bitmap getIcon(Resources resources) {
+    if (iconId == 0) {
+      return null;
+    }
+    return BitmapFactory.decodeResource(resources, iconId);
+  }
+
+  public Bitmap getBitmap() {
+    return bitmap;
+  }
+
   public static class Builder<T> {
     private T object;
     private long id;
+    private int iconId;
+    private Bitmap bitmap;
     private final MarkerOptions markerOptions;
 
     public Builder() {
@@ -132,6 +149,7 @@ public class AirMapMarker<T> {
     }
 
     public Builder<T> iconId(int iconId) {
+      this.iconId = iconId;
       try {
         markerOptions.icon(BitmapDescriptorFactory.fromResource(iconId));
       } catch (NullPointerException ignored) {
@@ -141,6 +159,7 @@ public class AirMapMarker<T> {
     }
 
     public Builder<T> bitmap(Bitmap bitmap) {
+      this.bitmap = bitmap;
       try {
         bitmapDescriptor(BitmapDescriptorFactory.fromBitmap(bitmap));
       } catch (NullPointerException ignored) {
@@ -180,7 +199,10 @@ public class AirMapMarker<T> {
     }
 
     public AirMapMarker<T> build() {
-      return new AirMapMarker<>(object, id, markerOptions);
+      AirMapMarker<T> marker = new AirMapMarker<>(object, id, markerOptions);
+      marker.iconId = iconId;
+      marker.bitmap = bitmap;
+      return marker;
     }
   }
 }

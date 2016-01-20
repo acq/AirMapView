@@ -107,12 +107,13 @@ function addMarker(lat, lng) {
   });
 }
 
-function addMarkerWithId(lat, lng, id, title, snippet, draggable) {
+function addMarkerWithId(lat, lng, id, title, snippet, draggable, icon) {
   var position = new google.maps.LatLng(lat, lng);
+  var image = icon != "null" ? icon : getMarkerIcon('red-dot.png');
   var marker = new google.maps.Marker({
       position: position,
       map: map,
-      icon: getMarkerIcon('red-dot.png'),
+      icon: image,
       draggable: draggable
   });
 

@@ -23,6 +23,7 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
@@ -95,7 +96,7 @@ public class DefaultClusterRenderer<T extends ClusterItem> implements ClusterRen
     /**
      * Icons for each bucket.
      */
-    private SparseArray<BitmapDescriptor> mIcons = new SparseArray<>();
+    private SparseArray<Bitmap> mIcons = new SparseArray<>();
 
     /**
      * Markers for single ClusterItems.
@@ -731,23 +732,23 @@ public class DefaultClusterRenderer<T extends ClusterItem> implements ClusterRen
     /**
      * Called before the marker for a ClusterItem is added to the map.
      */
-    protected void onBeforeClusterItemRendered(T item, MarkerOptions markerOptions) {
+    protected void onBeforeClusterItemRendered(T item, AirMapMarker.Builder markerOptions) {
     }
 
     /**
      * Called before the marker for a Cluster is added to the map.
      * The default implementation draws a circle with a rough count of the number of items.
      */
-    protected void onBeforeClusterRendered(Cluster<T> cluster, MarkerOptions markerOptions) {
+    protected void onBeforeClusterRendered(Cluster<T> cluster, AirMapMarker.Builder markerOptions) {
         int bucket = getBucket(cluster);
-        BitmapDescriptor descriptor = mIcons.get(bucket);
-        if (descriptor == null) {
+        Bitmap bitmap = mIcons.get(bucket);
+        if (bitmap == null) {
             mColoredCircleBackground.getPaint().setColor(getColor(bucket));
-            descriptor = BitmapDescriptorFactory.fromBitmap(mIconGenerator.makeIcon(getClusterText(bucket)));
-            mIcons.put(bucket, descriptor);
+            bitmap = mIconGenerator.makeIcon(getClusterText(bucket));
+            mIcons.put(bucket, bitmap);
         }
         // TODO: consider adding anchor(.5, .5) (Individual markers will overlap more often)
-        markerOptions.icon(descriptor);
+        markerOptions.bitmap(bitmap);
     }
 
     /**
@@ -825,14 +826,14 @@ public class DefaultClusterRenderer<T extends ClusterItem> implements ClusterRen
                     AirMapMarker marker = mMarkerCache.get(item);
                     MarkerWithPosition markerWithPosition;
                     if (marker == null) {
-                        MarkerOptions markerOptions = new MarkerOptions();
+                        AirMapMarker.Builder builder = new AirMapMarker.Builder();
                         if (animateFrom != null) {
-                            markerOptions.position(animateFrom);
+                            builder.position(animateFrom);
                         } else {
-                            markerOptions.position(item.getPosition());
+                            builder.position(item.getPosition());
                         }
-                        onBeforeClusterItemRendered(item, markerOptions);
-                        marker = mClusterManager.getMarkerCollection().addMarker(markerOptions);
+                        onBeforeClusterItemRendered(item, builder);
+                        marker = mClusterManager.getMarkerCollection().addMarker(builder.build());
                         markerWithPosition = new MarkerWithPosition(marker);
                         mMarkerCache.put(item, marker);
                         if (animateFrom != null) {
@@ -847,12 +848,12 @@ public class DefaultClusterRenderer<T extends ClusterItem> implements ClusterRen
                 return;
             }
 
-            MarkerOptions markerOptions = new MarkerOptions().
+            AirMapMarker.Builder builder = new AirMapMarker.Builder().
                     position(animateFrom == null ? cluster.getPosition() : animateFrom);
 
-            onBeforeClusterRendered(cluster, markerOptions);
+            onBeforeClusterRendered(cluster, builder);
 
-            AirMapMarker marker = mClusterManager.getClusterMarkerCollection().addMarker(markerOptions);
+            AirMapMarker marker = mClusterManager.getClusterMarkerCollection().addMarker(builder.build());
             mMarkerToCluster.put(marker, cluster);
             mClusterToMarker.put(cluster, marker);
             MarkerWithPosition markerWithPosition = new MarkerWithPosition(marker);
