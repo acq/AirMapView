@@ -1,6 +1,6 @@
 package com.airbnb.android.airmapview.utils.kml;
 
-import com.google.android.gms.maps.model.GroundOverlay;
+import com.airbnb.android.airmapview.AirMapGroundOverlay;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -62,13 +62,13 @@ import static org.xmlpull.v1.XmlPullParser.START_TAG;
             throws XmlPullParserException, IOException {
         String startTag = parser.getName();
         String containerId = null;
-        HashMap<String, String> containerProperties = new HashMap<String, String>();
-        HashMap<String, KmlStyle> containerStyles = new HashMap<String, KmlStyle>();
-        HashMap<KmlPlacemark, Object> containerPlacemarks = new HashMap<KmlPlacemark, Object>();
-        ArrayList<KmlContainer> nestedContainers = new ArrayList<KmlContainer>();
-        HashMap<String, String> containerStyleMaps = new HashMap<String, String>();
-        HashMap<KmlGroundOverlay, GroundOverlay> containerGroundOverlays
-                = new HashMap<KmlGroundOverlay, GroundOverlay>();
+        HashMap<String, String> containerProperties = new HashMap<>();
+        HashMap<String, KmlStyle> containerStyles = new HashMap<>();
+        HashMap<KmlPlacemark, Object> containerPlacemarks = new HashMap<>();
+        ArrayList<KmlContainer> nestedContainers = new ArrayList<>();
+        HashMap<String, String> containerStyleMaps = new HashMap<>();
+        HashMap<KmlGroundOverlay, AirMapGroundOverlay> containerGroundOverlays
+                = new HashMap<>();
 
         if (parser.getAttributeValue(null, "id") != null) {
             containerId = parser.getAttributeValue(null, "id");

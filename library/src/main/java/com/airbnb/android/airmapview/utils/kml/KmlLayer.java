@@ -1,6 +1,6 @@
 package com.airbnb.android.airmapview.utils.kml;
 
-import com.google.android.gms.maps.GoogleMap;
+import com.airbnb.android.airmapview.AirMapView;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -26,7 +26,7 @@ public class KmlLayer {
      * @param context    Context object
      * @throws XmlPullParserException if file cannot be parsed
      */
-    public KmlLayer(GoogleMap map, int resourceId, Context context)
+    public KmlLayer(AirMapView map, int resourceId, Context context)
             throws XmlPullParserException, IOException {
         this(map, context.getResources().openRawResource(resourceId), context);
     }
@@ -38,7 +38,7 @@ public class KmlLayer {
      * @param stream InputStream containing KML file
      * @throws XmlPullParserException if file cannot be parsed
      */
-    public KmlLayer(GoogleMap map, InputStream stream, Context context)
+    public KmlLayer(AirMapView map, InputStream stream, Context context)
             throws XmlPullParserException, IOException {
         if (stream == null) {
             throw new IllegalArgumentException("KML InputStream cannot be null");
@@ -131,7 +131,7 @@ public class KmlLayer {
      *
      * @return map
      */
-    public GoogleMap getMap() {
+    public AirMapView getMap() {
         return mRenderer.getMap();
     }
 
@@ -140,7 +140,7 @@ public class KmlLayer {
      *
      * @param map map to place placemark, container, style and ground overlays on
      */
-    public void setMap(GoogleMap map) {
+    public void setMap(AirMapView map) {
         mRenderer.setMap(map);
     }
 

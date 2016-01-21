@@ -1,6 +1,6 @@
 package com.airbnb.android.airmapview.utils.kml;
 
-import com.google.android.gms.maps.model.GroundOverlayOptions;
+import com.airbnb.android.airmapview.AirMapGroundOverlay;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import java.util.HashMap;
@@ -13,7 +13,7 @@ public class KmlGroundOverlay {
 
     private final Map<String, String> mProperties;
 
-    private final GroundOverlayOptions mGroundOverlayOptions;
+    private final AirMapGroundOverlay.Builder mGroundOverlayBuilder;
 
     private String mImageUrl;
 
@@ -31,17 +31,17 @@ public class KmlGroundOverlay {
      */
     /* package */ KmlGroundOverlay(String imageUrl, LatLngBounds latLonBox, float drawOrder,
                                    int visibility, HashMap<String, String> properties, float rotation) {
-        mGroundOverlayOptions = new GroundOverlayOptions();
+        mGroundOverlayBuilder = new AirMapGroundOverlay.Builder();
         mImageUrl = imageUrl;
         mProperties = properties;
         if (latLonBox == null) {
             throw new IllegalArgumentException("No LatLonBox given");
         }
         mLatLngBox = latLonBox;
-        mGroundOverlayOptions.positionFromBounds(latLonBox);
-        mGroundOverlayOptions.bearing(rotation);
-        mGroundOverlayOptions.zIndex(drawOrder);
-        mGroundOverlayOptions.visible(visibility != 0);
+        mGroundOverlayBuilder.positionFromBounds(latLonBox);
+        mGroundOverlayBuilder.bearing(rotation);
+        mGroundOverlayBuilder.zIndex(drawOrder);
+        mGroundOverlayBuilder.visible(visibility != 0);
     }
 
     /**
@@ -96,8 +96,8 @@ public class KmlGroundOverlay {
      *
      * @return GroundOverlayOptions
      */
-    /* package */ GroundOverlayOptions getGroundOverlayOptions() {
-        return mGroundOverlayOptions;
+    /* package */ AirMapGroundOverlay.Builder getGroundOverlay() {
+        return mGroundOverlayBuilder;
     }
 
     @Override

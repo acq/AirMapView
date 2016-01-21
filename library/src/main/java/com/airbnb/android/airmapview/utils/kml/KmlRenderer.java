@@ -1,11 +1,14 @@
 package com.airbnb.android.airmapview.utils.kml;
 
+import com.airbnb.android.airmapview.AirMapGroundOverlay;
+import com.airbnb.android.airmapview.AirMapMarker;
+import com.airbnb.android.airmapview.AirMapPolygon;
+import com.airbnb.android.airmapview.AirMapPolyline;
+import com.airbnb.android.airmapview.AirMapView;
 import com.airbnb.android.airmapview.R;
-import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.GroundOverlay;
-import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -28,7 +31,6 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,7 +52,7 @@ import java.util.Iterator;
 
     private final ArrayList<String> mGroundOverlayUrls;
 
-    private GoogleMap mMap;
+    private AirMapView mMap;
 
     private HashMap<KmlPlacemark, Object> mPlacemarks;
 
@@ -62,7 +64,7 @@ import java.util.Iterator;
 
     private HashMap<String, KmlStyle> mStylesRenderer;
 
-    private HashMap<KmlGroundOverlay, GroundOverlay> mGroundOverlays;
+    private HashMap<KmlGroundOverlay, AirMapGroundOverlay> mGroundOverlays;
 
     private boolean mLayerVisible;
 
@@ -72,13 +74,13 @@ import java.util.Iterator;
 
     private Context mContext;
 
-    /* package */ KmlRenderer(GoogleMap map, Context context) {
+    /* package */ KmlRenderer(AirMapView map, Context context) {
         mContext = context;
         mMap = map;
-        mImagesCache = new LruCache<String, Bitmap>(LRU_CACHE_SIZE);
-        mMarkerIconUrls = new ArrayList<String>();
-        mGroundOverlayUrls = new ArrayList<String>();
-        mStylesRenderer = new HashMap<String, KmlStyle>();
+        mImagesCache = new LruCache<>(LRU_CACHE_SIZE);
+        mMarkerIconUrls = new ArrayList<>();
+        mGroundOverlayUrls = new ArrayList<>();
+        mStylesRenderer = new HashMap<>();
         mLayerVisible = false;
         mMarkerIconsDownloaded = false;
         mGroundOverlayImagesDownloaded = false;
@@ -160,9 +162,9 @@ import java.util.Iterator;
      *
      * @param groundOverlays hashmap of ground overlays to remove
      */
-    private void removeGroundOverlays(HashMap<KmlGroundOverlay, GroundOverlay> groundOverlays) {
-        for (GroundOverlay groundOverlay : groundOverlays.values()) {
-            groundOverlay.remove();
+    private void removeGroundOverlays(HashMap<KmlGroundOverlay, AirMapGroundOverlay> groundOverlays) {
+        for (AirMapGroundOverlay groundOverlay : groundOverlays.values()) {
+            mMap.removeGroundOverlay(groundOverlay);
         }
     }
 
@@ -203,7 +205,7 @@ import java.util.Iterator;
     /* package */ void storeKmlData(HashMap<String, KmlStyle> styles,
                                     HashMap<String, String> styleMaps,
                                     HashMap<KmlPlacemark, Object> placemarks, ArrayList<KmlContainer> folders,
-                                    HashMap<KmlGroundOverlay, GroundOverlay> groundOverlays) {
+                                    HashMap<KmlGroundOverlay, AirMapGroundOverlay> groundOverlays) {
         mStyles = styles;
         mStyleMaps = styleMaps;
         mPlacemarks = placemarks;
@@ -231,7 +233,7 @@ import java.util.Iterator;
      *
      * @return map
      */
-    /* package */ GoogleMap getMap() {
+    /* package */ AirMapView getMap() {
         return mMap;
     }
 
@@ -240,7 +242,7 @@ import java.util.Iterator;
      *
      * @param map map to place placemark, container, style and ground overlays on
      */
-    /* package */ void setMap(GoogleMap map) {
+    /* package */ void setMap(AirMapView map) {
         removeLayerFromMap();
         mMap = map;
         addLayerToMap();
@@ -483,20 +485,27 @@ import java.util.Iterator;
                             KmlStyle inlineStyle, boolean isVisible) {
 
         String geometryType = geometry.getGeometryType();
-        if (geometryType.equals("Point")) {
-            Marker marker = addPointToMap(placemark, (KmlPoint) geometry, style, inlineStyle);
-            marker.setVisible(isVisible);
-            return marker;
-        } else if (geometryType.equals("LineString")) {
-            Polyline polyline = addLineStringToMap((KmlLineString) geometry, style, inlineStyle);
-            polyline.setVisible(isVisible);
-            return polyline;
-        } else if (geometryType.equals("Polygon")) {
-            Polygon polygon = addPolygonToMap((KmlPolygon) geometry, style, inlineStyle);
-            polygon.setVisible(isVisible);
-            return polygon;
-        } else if (geometryType.equals("MultiGeometry")) {
-            return addMultiGeometryToMap(placemark, (KmlMultiGeometry) geometry, style, inlineStyle,
+        switch (geometryType) {
+            case "Point":
+                AirMapMarker marker = addPointToMap(placemark, (KmlPoint) geometry, style, inlineStyle);
+                if (!isVisible) {
+                    mMap.removeMarker(marker);
+                }
+                return marker;
+            case "LineString":
+                AirMapPolyline polyline = addLineStringToMap((KmlLineString) geometry, style, inlineStyle);
+                if (!isVisible) {
+                    mMap.removePolyline(polyline);
+                }
+                return polyline;
+            case "Polygon":
+                AirMapPolygon polygon = addPolygonToMap((KmlPolygon) geometry, style, inlineStyle);
+                if (!isVisible) {
+                    mMap.removePolygon(polygon);
+                }
+                return polygon;
+            case "MultiGeometry":
+                return addMultiGeometryToMap(placemark, (KmlMultiGeometry) geometry, style, inlineStyle,
                     isVisible);
         }
 
@@ -510,7 +519,7 @@ import java.util.Iterator;
      * @param style contains relevant styling properties for the Marker
      * @return Marker object
      */
-    private Marker addPointToMap(KmlPlacemark placemark, KmlPoint point, KmlStyle style,
+    private AirMapMarker addPointToMap(KmlPlacemark placemark, KmlPoint point, KmlStyle style,
                                  KmlStyle markerInlineStyle) {
         MarkerOptions markerUrlStyle = style.getMarkerOptions();
         markerUrlStyle.position(point.getGeometryObject());
@@ -520,8 +529,10 @@ import java.util.Iterator;
             // Use shared style
             addMarkerIcons(style.getIconUrl(), markerUrlStyle);
         }
-        Marker marker = mMap.addMarker(markerUrlStyle);
-        setMarkerInfoWindow(style, marker, placemark);
+        AirMapMarker.Builder builder = new AirMapMarker.Builder<>(markerUrlStyle);
+        setMarkerInfoWindow(style, builder, placemark);
+        AirMapMarker marker = builder.build();
+        mMap.addMarker(marker);
         return marker;
     }
 
@@ -531,24 +542,24 @@ import java.util.Iterator;
      *
      * @param style Style to apply
      */
-    private void setMarkerInfoWindow(KmlStyle style, Marker marker,
+    private void setMarkerInfoWindow(KmlStyle style, AirMapMarker.Builder marker,
                                      final KmlPlacemark placemark) {
         boolean hasName = placemark.hasProperty("name");
         boolean hasDescription = placemark.hasProperty("description");
         boolean hasBalloonOptions = style.hasBalloonStyle();
         boolean hasBalloonText = style.getBalloonOptions().containsKey("text");
         if (hasBalloonOptions && hasBalloonText) {
-            marker.setTitle(style.getBalloonOptions().get("text"));
+            marker.title(style.getBalloonOptions().get("text"));
             createInfoWindow();
         } else if (hasBalloonOptions && hasName) {
-            marker.setTitle(placemark.getProperty("name"));
+            marker.title(placemark.getProperty("name"));
             createInfoWindow();
         } else if (hasName && hasDescription) {
-            marker.setTitle(placemark.getProperty("name"));
-            marker.setSnippet(placemark.getProperty("description"));
+            marker.title(placemark.getProperty("name"));
+            marker.snippet(placemark.getProperty("description"));
             createInfoWindow();
         } else if (hasDescription) {
-            marker.setTitle(placemark.getProperty("description"));
+            marker.title(placemark.getProperty("description"));
             createInfoWindow();
         }
     }
@@ -558,7 +569,7 @@ import java.util.Iterator;
      * the info window to have custom HTML.
      */
     private void createInfoWindow() {
-        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+        mMap.setInfoWindowAdapter(new InfoWindowAdapter() {
 
             public View getInfoWindow(Marker arg0) {
                 return null;
@@ -574,7 +585,7 @@ import java.util.Iterator;
                 }
                 return view;
             }
-        });
+        }, null);
     }
 
     /**
@@ -612,8 +623,8 @@ import java.util.Iterator;
      * @param style      contains relevant styling properties for the Polyline
      * @return Polyline object
      */
-    private Polyline addLineStringToMap(KmlLineString lineString, KmlStyle style,
-                                        KmlStyle inlineStyle) {
+    private AirMapPolyline addLineStringToMap(KmlLineString lineString, KmlStyle style,
+                                              KmlStyle inlineStyle) {
         PolylineOptions polylineOptions = style.getPolylineOptions();
         polylineOptions.addAll(lineString.getGeometryObject());
         if (inlineStyle != null) {
@@ -621,7 +632,9 @@ import java.util.Iterator;
         } else if (style.isLineRandomColorMode()) {
             polylineOptions.color(KmlStyle.computeRandomColor(polylineOptions.getColor()));
         }
-        return mMap.addPolyline(polylineOptions);
+        AirMapPolyline polyline = new AirMapPolyline.Builder(polylineOptions).build();
+        mMap.addPolyline(polyline);
+        return polyline;
     }
 
     /**
@@ -650,7 +663,7 @@ import java.util.Iterator;
      * @param style   contains relevant styling properties for the Polygon
      * @return Polygon object
      */
-    private Polygon addPolygonToMap(KmlPolygon polygon, KmlStyle style, KmlStyle inlineStyle) {
+    private AirMapPolygon addPolygonToMap(KmlPolygon polygon, KmlStyle style, KmlStyle inlineStyle) {
         PolygonOptions polygonOptions = style.getPolygonOptions();
         polygonOptions.addAll(polygon.getOuterBoundaryCoordinates());
         for (ArrayList<LatLng> innerBoundary : polygon.getInnerBoundaryCoordinates()) {
@@ -661,7 +674,9 @@ import java.util.Iterator;
         } else if (style.isPolyRandomColorMode()) {
             polygonOptions.fillColor(KmlStyle.computeRandomColor(polygonOptions.getFillColor()));
         }
-        return mMap.addPolygon(polygonOptions);
+        AirMapPolygon airMapPolygon = new AirMapPolygon.Builder(polygonOptions).build();
+        mMap.addPolygon(airMapPolygon);
+        return airMapPolygon;
     }
 
     /**
@@ -699,7 +714,7 @@ import java.util.Iterator;
     private ArrayList<Object> addMultiGeometryToMap(KmlPlacemark placemark,
                                                     KmlMultiGeometry multiGeometry, KmlStyle urlStyle, KmlStyle inlineStyle,
                                                     boolean isContainerVisible) {
-        ArrayList<Object> mapObjects = new ArrayList<Object>();
+        ArrayList<Object> mapObjects = new ArrayList<>();
         ArrayList<KmlGeometry> kmlObjects = multiGeometry.getGeometryObject();
         for (KmlGeometry kmlGeometry : kmlObjects) {
             mapObjects.add(addToMap(placemark, kmlGeometry, urlStyle, inlineStyle,
@@ -715,7 +730,7 @@ import java.util.Iterator;
      * @param groundOverlays ground overlays to add to the map
      * @param kmlContainers  containers to check for ground overlays
      */
-    private void addGroundOverlays(HashMap<KmlGroundOverlay, GroundOverlay> groundOverlays,
+    private void addGroundOverlays(HashMap<KmlGroundOverlay, AirMapGroundOverlay> groundOverlays,
             Iterable<KmlContainer> kmlContainers) {
         addGroundOverlays(groundOverlays);
         for (KmlContainer container : kmlContainers) {
@@ -729,7 +744,7 @@ import java.util.Iterator;
      *
      * @param groundOverlays hashmap of ground overlays to add to the map
      */
-    private void addGroundOverlays(HashMap<KmlGroundOverlay, GroundOverlay> groundOverlays) {
+    private void addGroundOverlays(HashMap<KmlGroundOverlay, AirMapGroundOverlay> groundOverlays) {
         for (KmlGroundOverlay groundOverlay : groundOverlays.keySet()) {
             String groundOverlayUrl = groundOverlay.getImageUrl();
             if (groundOverlayUrl != null && groundOverlay.getLatLngBox() != null) {
@@ -762,16 +777,16 @@ import java.util.Iterator;
      * @param groundOverlays   hashmap of ground overlays to add to the map
      */
     private void addGroundOverlayToMap(String groundOverlayUrl,
-                                       HashMap<KmlGroundOverlay, GroundOverlay> groundOverlays, boolean containerVisibility) {
-        BitmapDescriptor groundOverlayBitmap = BitmapDescriptorFactory
-                .fromBitmap(mImagesCache.get(groundOverlayUrl));
+                                       HashMap<KmlGroundOverlay, AirMapGroundOverlay> groundOverlays, boolean containerVisibility) {
+        Bitmap bitmap = mImagesCache.get(groundOverlayUrl);
         for (KmlGroundOverlay kmlGroundOverlay : groundOverlays.keySet()) {
             if (kmlGroundOverlay.getImageUrl().equals(groundOverlayUrl)) {
-                GroundOverlayOptions groundOverlayOptions = kmlGroundOverlay.getGroundOverlayOptions()
-                        .image(groundOverlayBitmap);
-                GroundOverlay mapGroundOverlay = mMap.addGroundOverlay(groundOverlayOptions);
-                if (containerVisibility == false) {
-                    mapGroundOverlay.setVisible(false);
+                AirMapGroundOverlay.Builder groundOverlayBuilder = kmlGroundOverlay.getGroundOverlay()
+                        .bitmap(bitmap);
+                AirMapGroundOverlay mapGroundOverlay = groundOverlayBuilder.build();
+                mMap.addGroundOverlay(mapGroundOverlay);
+                if (!containerVisibility) {
+                    mMap.removeGroundOverlay(mapGroundOverlay);
                 }
                 groundOverlays.put(kmlGroundOverlay, mapGroundOverlay);
             }
@@ -822,8 +837,6 @@ import java.util.Iterator;
         protected Bitmap doInBackground(String... params) {
             try {
                 return BitmapFactory.decodeStream((InputStream) new URL(mIconUrl).getContent());
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -871,8 +884,6 @@ import java.util.Iterator;
             try {
                 return BitmapFactory
                         .decodeStream((InputStream) new URL(mGroundOverlayUrl).getContent());
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -13,6 +13,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,15 +21,13 @@ import java.net.URL;
 
 public class KmlDemoFragment extends BaseDemoFragment {
 
-    private KmlLayer kmlLayer;
-
     protected int getLayoutId() {
         return R.layout.kml_demo;
     }
 
     public void startDemo () {
         try {
-            //retrieveFileFromResource();
+            retrieveFileFromResource();
             retrieveFileFromUrl();
         } catch (Exception e) {
             Log.e("Exception caught", e.toString());
@@ -36,14 +35,12 @@ public class KmlDemoFragment extends BaseDemoFragment {
     }
 
     private void retrieveFileFromResource() {
-//        try {
-//            KmlLayer kmlLayer = new KmlLayer(mMap, R.raw.campus, getApplicationContext());
-//            kmlLayer.addLayerToMap();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (XmlPullParserException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            KmlLayer kmlLayer = new KmlLayer(mMap, R.raw.campus, getContext());
+            kmlLayer.addLayerToMap();
+        } catch (IOException | XmlPullParserException e) {
+            e.printStackTrace();
+        }
     }
 
     private void retrieveFileFromUrl() {
@@ -66,7 +63,7 @@ public class KmlDemoFragment extends BaseDemoFragment {
         for (LatLng latLng : polygon.getOuterBoundaryCoordinates()) {
             builder.include(latLng);
         }
-        getMap().animateCenterZoom(builder.build().getCenter(), 1);
+        getMap().animateCenterZoom(builder.build().getCenter(), 16);
     }
 
     private class DownloadKmlFile extends AsyncTask<String, Void, byte[]> {
@@ -95,8 +92,8 @@ public class KmlDemoFragment extends BaseDemoFragment {
 
         protected void onPostExecute(byte[] byteArr) {
             try {
-//                kmlLayer = new KmlLayer(mMap, new ByteArrayInputStream(byteArr),
-//                        getApplicationContext());
+                KmlLayer kmlLayer = new KmlLayer(mMap, new ByteArrayInputStream(byteArr),
+                    getContext());
                 kmlLayer.addLayerToMap();
                 moveCameraToKml(kmlLayer);
             } catch (XmlPullParserException | IOException e) {

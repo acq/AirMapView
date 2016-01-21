@@ -1,6 +1,6 @@
 package com.airbnb.android.airmapview.utils.kml;
 
-import com.google.android.gms.maps.model.GroundOverlay;
+import com.airbnb.android.airmapview.AirMapGroundOverlay;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -34,7 +34,7 @@ import java.util.HashMap;
 
     private final HashMap<String, String> mStyleMaps;
 
-    private final HashMap<KmlGroundOverlay, GroundOverlay> mGroundOverlays;
+    private final HashMap<KmlGroundOverlay, AirMapGroundOverlay> mGroundOverlays;
 
     private final static String UNSUPPORTED_REGEX = "altitude|altitudeModeGroup|altitudeMode|" +
             "begin|bottomFov|cookie|displayName|displayMode|displayMode|end|expires|extrude|" +
@@ -53,11 +53,11 @@ import java.util.HashMap;
      */
     /* package */ KmlParser(XmlPullParser parser) {
         mParser = parser;
-        mPlacemarks = new HashMap<KmlPlacemark, Object>();
-        mContainers = new ArrayList<KmlContainer>();
-        mStyles = new HashMap<String, KmlStyle>();
-        mStyleMaps = new HashMap<String, String>();
-        mGroundOverlays = new HashMap<KmlGroundOverlay, GroundOverlay>();
+        mPlacemarks = new HashMap<>();
+        mContainers = new ArrayList<>();
+        mStyles = new HashMap<>();
+        mStyleMaps = new HashMap<>();
+        mGroundOverlays = new HashMap<>();
     }
 
     /**
@@ -124,7 +124,7 @@ import java.util.HashMap;
     /**
      * @return A list of Ground Overlays
      */
-    /* package */ HashMap<KmlGroundOverlay, GroundOverlay> getGroundOverlays() {
+    /* package */ HashMap<KmlGroundOverlay, AirMapGroundOverlay> getGroundOverlays() {
         return mGroundOverlays;
     }
 

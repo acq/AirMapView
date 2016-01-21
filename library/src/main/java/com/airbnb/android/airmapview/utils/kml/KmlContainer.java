@@ -1,6 +1,6 @@
 package com.airbnb.android.airmapview.utils.kml;
 
-import com.google.android.gms.maps.model.GroundOverlay;
+import com.airbnb.android.airmapview.AirMapGroundOverlay;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +16,7 @@ public class KmlContainer {
 
     private final ArrayList<KmlContainer> mContainers;
 
-    private final HashMap<KmlGroundOverlay, GroundOverlay> mGroundOverlays;
+    private final HashMap<KmlGroundOverlay, AirMapGroundOverlay> mGroundOverlays;
 
     private final HashMap<String, String> mStyleMap;
 
@@ -26,7 +26,7 @@ public class KmlContainer {
 
     /*package*/ KmlContainer(HashMap<String, String> properties, HashMap<String, KmlStyle> styles,
                              HashMap<KmlPlacemark, Object> placemarks, HashMap<String, String> styleMaps,
-                             ArrayList<KmlContainer> containers, HashMap<KmlGroundOverlay, GroundOverlay>
+                             ArrayList<KmlContainer> containers, HashMap<KmlGroundOverlay, AirMapGroundOverlay>
             groundOverlay, String Id) {
         mProperties = properties;
         mPlacemarks = placemarks;
@@ -67,7 +67,7 @@ public class KmlContainer {
      *
      * @return A set of ground overlays
      */
-    /* package */ HashMap<KmlGroundOverlay, GroundOverlay> getGroundOverlayHashMap() {
+    /* package */ HashMap<KmlGroundOverlay, AirMapGroundOverlay> getGroundOverlayHashMap() {
         return mGroundOverlays;
     }
 
