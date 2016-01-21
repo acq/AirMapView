@@ -1,10 +1,12 @@
 package com.google.maps.android.utils.demo;
 
 import com.airbnb.airmapview.sample.R;
+import com.airbnb.android.airmapview.AirMapGroundOverlay;
 import com.airbnb.android.airmapview.AirMapMarker;
 import com.airbnb.android.airmapview.AirMapPolygon;
 import com.airbnb.android.airmapview.AirMapPolyline;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 import java.util.Arrays;
 
@@ -45,6 +47,12 @@ public class DefaultDemoFragment extends BaseDemoFragment {
 
     // enable my location
     getMap().setMyLocationEnabled(true);
+
+    getMap().addGroundOverlay(new AirMapGroundOverlay.Builder()
+        .imageId(R.drawable.newark_nj_1922)
+        .imageUrl("https://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg")
+        .positionFromBounds(new LatLngBounds(new LatLng(40.712216, -74.22655), new LatLng(40.773941, -74.12544)))
+        .build());
   }
 
   private void addMarker(String title, LatLng latLng, int id) {

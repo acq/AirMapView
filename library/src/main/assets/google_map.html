@@ -19,6 +19,7 @@ var markers = {};
 var infoWindowContent = {};
 var polylines = {};
 var polygons = {};
+var groundOverlays = {};
 var moveTimeout;
 var GeoMarker = null;
 var markerIconPrefix;
@@ -41,7 +42,7 @@ function initialize() {
   overlay.setMap(map);
 
   google.maps.event.addListener(map, 'click', mapClick);
-  google.maps.event.addListener(map, 'center_changed', mapMove)
+  google.maps.event.addListener(map, 'center_changed', mapMove);
 
   AirMapView.onMapLoaded();
 }
@@ -72,7 +73,7 @@ function setBounds(neLat, neLng, swLat, swLng) {
   var sw = new google.maps.LatLng(swLat, swLng);
   var ne = new google.maps.LatLng(neLat, neLng);
   var center = new google.maps.LatLngBounds(sw, ne);
-  map.fitBounds(center)
+  map.fitBounds(center);
 }
 
 function centerMap(lat, lng) {
@@ -230,6 +231,27 @@ function removePolygon(id) {
   }
 }
 
+function addGroundOverlay(id, north, south, east, west, image) {
+  var imageBounds = {
+    north: north,
+    south: south,
+    east: east,
+    west: west
+  };
+
+  var overlay = new google.maps.GroundOverlay(image, imageBounds);
+  overlay.setMap(map);
+
+  groundOverlays[id] = overlay;
+}
+
+function removeGroundOverlay(id) {
+  var overlay = groundOverlays[id];
+  if (overlay != null) {
+    overlay.setMap(null);
+  }
+}
+
 function addCircle(lat, lng, radius, strokeColor, strokeWeight, fillColor) {
   var position = new google.maps.LatLng(lat, lng);
   var populationOptions = {
@@ -284,9 +306,9 @@ function getBounds() {
 }
 
 function getScreenLocation(lat, lng) {
-    latLng = new google.maps.LatLng(lat, lng)
+    latLng = new google.maps.LatLng(lat, lng);
     screenLocation = overlay.getProjection().fromLatLngToContainerPixel(latLng);
-    AirMapView.getLatLngScreenLocationCallback(screenLocation.x, screenLocation.y)
+    AirMapView.getLatLngScreenLocationCallback(screenLocation.x, screenLocation.y);
 }
 
 // converts an android int color to a web color :)

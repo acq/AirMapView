@@ -318,6 +318,21 @@ public abstract class WebViewMapFragment extends Fragment implements AirMapInter
     }
   }
 
+  @Override
+  public void addGroundOverlay(AirMapGroundOverlay overlay) {
+    webView.loadUrl(String.format(Locale.US,
+        "javascript:addGroundOverlay(%1$d, %2$f, %3$f, %4$f, %5$f, '%6$s');", overlay.getId(),
+        overlay.getBounds().northeast.latitude, overlay.getBounds().southwest.latitude,
+        overlay.getBounds().northeast.longitude, overlay.getBounds().southwest.longitude,
+        overlay.getImageUrl() != null ? overlay.getImageUrl() : bitmapToBase64String(overlay.getBitmap(getResources()))));
+  }
+
+  @Override
+  public void removeGroundOverlay(AirMapGroundOverlay overlay) {
+    webView.loadUrl(String.format(Locale.US,
+        "javascript:removeGroundOverlay(%1$d);", overlay.getId()));
+  }
+
   @Override public <T> void removePolygon(AirMapPolygon<T> polygon) {
     webView.loadUrl(String.format(Locale.US, "javascript:removePolygon(%1$d);", polygon.getId()));
   }

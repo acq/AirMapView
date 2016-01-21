@@ -349,6 +349,14 @@ public class AirMapView extends FrameLayout
     mapInterface.setMyLocationEnabled(trackUserLocation);
   }
 
+  public void addGroundOverlay(AirMapGroundOverlay overlay) {
+    mapInterface.addGroundOverlay(overlay);
+  }
+
+  public void removeGroundOverlay(AirMapGroundOverlay overlay) {
+    mapInterface.removeGroundOverlay(overlay);
+  }
+
   @Override public void onCameraChanged(LatLng latLng, int zoom) {
     if (onCameraChangeListener != null) {
       onCameraChangeListener.onCameraChanged(latLng, zoom);

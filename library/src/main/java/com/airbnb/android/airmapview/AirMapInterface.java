@@ -217,4 +217,8 @@ public interface AirMapInterface {
 
   /** Get a Bitmap snapshot of the current */
   void getSnapshot(OnSnapshotReadyListener listener);
+
+  void addGroundOverlay(AirMapGroundOverlay overlay);
+
+  void removeGroundOverlay(AirMapGroundOverlay overlay);
 }
