@@ -24,9 +24,9 @@ import com.airbnb.android.airmapview.listeners.InfoWindowCreator;
 import com.airbnb.android.airmapview.listeners.OnInfoWindowClickListener;
 import com.airbnb.android.airmapview.listeners.OnMapMarkerClickListener;
 import com.airbnb.android.airmapview.listeners.OnMapMarkerDragListener;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -185,6 +185,7 @@ public class MarkerManager implements OnInfoWindowClickListener, OnMapMarkerClic
         private OnMapMarkerClickListener mMarkerClickListener;
         private OnMapMarkerDragListener mMarkerDragListener;
         private InfoWindowCreator mInfoWindowCreator;
+        private GoogleMap.InfoWindowAdapter mInfoWindowAdapter;
 
         public Collection() {
         }
@@ -235,7 +236,8 @@ public class MarkerManager implements OnInfoWindowClickListener, OnMapMarkerClic
             mMarkerDragListener = markerDragListener;
         }
 
-        public void setOnInfoWindowCreator(InfoWindowCreator infoWindowCreator) {
+        public void setOnInfoWindowAdapter(GoogleMap.InfoWindowAdapter infoWindowAdapter, InfoWindowCreator infoWindowCreator) {
+            mInfoWindowAdapter = infoWindowAdapter;
             mInfoWindowCreator = infoWindowCreator;
         }
     }
