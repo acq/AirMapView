@@ -317,6 +317,10 @@ public abstract class WebViewMapFragment extends Fragment implements AirMapInter
       Log.e(TAG, "error constructing polyline JSON", e);
     }
   }
+  
+  @Override public void removePolygon(AirMapPolygon polygon) {
+    webView.loadUrl(String.format(Locale.US, "javascript:removePolygon(%1$d);", polygon.getId()));
+  }
 
   @Override
   public void addGroundOverlay(AirMapGroundOverlay overlay) {
@@ -331,10 +335,6 @@ public abstract class WebViewMapFragment extends Fragment implements AirMapInter
   public void removeGroundOverlay(AirMapGroundOverlay overlay) {
     webView.loadUrl(String.format(Locale.US,
         "javascript:removeGroundOverlay(%1$d);", overlay.getId()));
-  }
-
-  @Override public <T> void removePolygon(AirMapPolygon<T> polygon) {
-    webView.loadUrl(String.format(Locale.US, "javascript:removePolygon(%1$d);", polygon.getId()));
   }
 
   @Override public void setOnMapClickListener(final OnMapClickListener listener) {

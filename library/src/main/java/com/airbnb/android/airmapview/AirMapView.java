@@ -349,12 +349,20 @@ public class AirMapView extends FrameLayout
     mapInterface.setMyLocationEnabled(trackUserLocation);
   }
 
-  public void addGroundOverlay(AirMapGroundOverlay overlay) {
-    mapInterface.addGroundOverlay(overlay);
+  public boolean addGroundOverlay(AirMapGroundOverlay overlay) {
+    if (isInitialized()) {
+      mapInterface.addGroundOverlay(overlay);
+      return true;
+    }
+    return false;
   }
 
-  public void removeGroundOverlay(AirMapGroundOverlay overlay) {
-    mapInterface.removeGroundOverlay(overlay);
+  public boolean removeGroundOverlay(AirMapGroundOverlay overlay) {
+    if (isInitialized()) {
+      mapInterface.removeGroundOverlay(overlay);
+      return true;
+    }
+    return false;
   }
 
   @Override public void onCameraChanged(LatLng latLng, int zoom) {
