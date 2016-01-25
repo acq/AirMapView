@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         getSupportFragmentManager().beginTransaction().replace(R.id.content, demo.fragment).commit();
         mListView.setSelection(position);
         ((DrawerLayout) findViewById(R.id.drawer_layout)).closeDrawer(GravityCompat.START);
+        setTitle(demo.demoName);
     }
 
     private class DemoAdapter extends BaseAdapter {
