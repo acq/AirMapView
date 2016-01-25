@@ -51,11 +51,12 @@ public class IconGeneratorDemoFragment extends BaseDemoFragment {
     }
 
     private void addIcon(IconGenerator iconFactory, String text, LatLng position) {
-        MarkerOptions markerOptions = new MarkerOptions().
-                icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(text))).
-                position(position).
-                anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
+        AirMapMarker marker = new AirMapMarker.Builder()
+            .bitmap(iconFactory.makeIcon(text))
+            .position(position)
+            .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV())
+            .build();
 
-        getMap().addMarker(new AirMapMarker.Builder<>(markerOptions).build());
+        getMap().addMarker(marker);
     }
 }
