@@ -57,21 +57,21 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         mListView.setAdapter(mDemoAdapter);
         mListView.setOnItemClickListener(this);
 
-        DefaultDemoFragment defaultDemoFragment = new DefaultDemoFragment();
-        addDemo("Default", defaultDemoFragment);
-        addDemo("Clustering", new ClusteringDemoFragment());
-        addDemo("Clustering: Custom Look", new CustomMarkerClusteringDemoFragment());
-        addDemo("Clustering: 2K markers", new BigClusteringDemoFragment());
-        addDemo("PolyUtil.decode", new PolyDecodeDemoFragment());
-        addDemo("PolyUtil.simplify", new PolySimplifyDemoFragment());
-        addDemo("IconGenerator", new IconGeneratorDemoFragment());
-        addDemo("SphericalUtil.computeDistanceBetween", new DistanceDemoFragment());
-        addDemo("Generating tiles", new TileProviderAndProjectionDemo());
-        addDemo("Heatmaps", new HeatmapsDemoFragment());
-        addDemo("Heatmaps with Places API", new HeatmapsPlacesDemoFragment());
-        addDemo("GeoJSON Layer", new GeoJsonDemoFragment());
-        addDemo("KML Layer Overlay", new KmlDemoFragment());
+        addDemo("Default", DefaultDemoFragment.class);
+        addDemo("Clustering", ClusteringDemoFragment.class);
+        addDemo("Clustering: Custom Look", CustomMarkerClusteringDemoFragment.class);
+        addDemo("Clustering: 2K markers", BigClusteringDemoFragment.class);
+        addDemo("PolyUtil.decode", PolyDecodeDemoFragment.class);
+        addDemo("PolyUtil.simplify", PolySimplifyDemoFragment.class);
+        addDemo("IconGenerator", IconGeneratorDemoFragment.class);
+        addDemo("SphericalUtil.computeDistanceBetween", DistanceDemoFragment.class);
+        addDemo("Generating tiles", TileProviderAndProjectionDemo.class);
+        addDemo("Heatmaps", HeatmapsDemoFragment.class);
+        addDemo("Heatmaps with Places API", HeatmapsPlacesDemoFragment.class);
+        addDemo("GeoJSON Layer", GeoJsonDemoFragment.class);
+        addDemo("KML Layer Overlay", KmlDemoFragment.class);
 
+        DefaultDemoFragment defaultDemoFragment = new DefaultDemoFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.content, defaultDemoFragment).commit();
     }
 
@@ -85,14 +85,18 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         }
     }
 
-    private void addDemo(String demoName, Fragment fragment) {
+    private void addDemo(String demoName, Class<? extends BaseDemoFragment> fragment) {
         mDemos.add(new Demo(demoName, fragment));
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Demo demo = mDemoAdapter.getItem(position);
-        getSupportFragmentManager().beginTransaction().replace(R.id.content, demo.fragment).commit();
+        try {
+            getSupportFragmentManager().beginTransaction().replace(R.id.content, demo.fragment.newInstance()).commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         mListView.setSelection(position);
         ((DrawerLayout) findViewById(R.id.drawer_layout)).closeDrawer(GravityCompat.START);
         setTitle(demo.demoName);
@@ -127,9 +131,9 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
 
     private static class Demo {
         private final String demoName;
-        private final Fragment fragment;
+        private final Class<? extends BaseDemoFragment> fragment;
 
-        public Demo(String demoName, Fragment fragment) {
+        public Demo(String demoName, Class<? extends BaseDemoFragment> fragment) {
             this.demoName = demoName;
             this.fragment = fragment;
         }
