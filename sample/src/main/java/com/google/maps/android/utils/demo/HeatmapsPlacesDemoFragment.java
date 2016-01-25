@@ -31,12 +31,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.airmapview.sample.R;
+import com.airbnb.android.airmapview.AirMapHeatmap;
 import com.airbnb.android.airmapview.AirMapView;
 import com.airbnb.android.airmapview.utils.SphericalUtil;
 import com.airbnb.android.airmapview.utils.heatmaps.Gradient;
-import com.airbnb.android.airmapview.utils.heatmaps.HeatmapTileProvider;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.TileOverlay;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -114,7 +113,7 @@ public class HeatmapsPlacesDemoFragment extends BaseDemoFragment {
     /**
      * Stores the TileOverlay corresponding to each of the keywords that have been searched for.
      */
-    private Hashtable<String, TileOverlay> mOverlays = new Hashtable<String, TileOverlay>();
+    private Hashtable<String, AirMapHeatmap> mHeatmaps = new Hashtable<>();
 
     /**
      * A layout containing checkboxes for each of the heatmaps rendered.
@@ -178,7 +177,7 @@ public class HeatmapsPlacesDemoFragment extends BaseDemoFragment {
         }
         EditText editText = (EditText) getView().findViewById(R.id.input_text);
         String keyword = editText.getText().toString();
-        if (mOverlays.contains(keyword)) {
+        if (mHeatmaps.contains(keyword)) {
             Toast.makeText(getContext(), "This keyword has already been inputted :(", Toast.LENGTH_SHORT).show();
         } else if (mOverlaysRendered == MAX_CHECKBOXES) {
             Toast.makeText(getContext(), "You can only input " + MAX_CHECKBOXES + " keywords. :(", Toast.LENGTH_SHORT).show();
@@ -204,11 +203,11 @@ public class HeatmapsPlacesDemoFragment extends BaseDemoFragment {
      * of LatLng objects.
      */
     private Collection<LatLng> getPoints(String keyword) {
-        HashMap<String, LatLng> results = new HashMap<String, LatLng>();
+        HashMap<String, LatLng> results = new HashMap<>();
 
         // Calculate four equidistant points around Sydney to use as search centers
         //   so that four searches can be done.
-        ArrayList<LatLng> searchCenters = new ArrayList<LatLng>(4);
+        ArrayList<LatLng> searchCenters = new ArrayList<>(4);
         for (int heading = 45; heading < 360; heading += 90) {
             searchCenters.add(SphericalUtil.computeOffset(SYDNEY, SEARCH_RADIUS / 2, heading));
         }
@@ -297,9 +296,13 @@ public class HeatmapsPlacesDemoFragment extends BaseDemoFragment {
             public void onClick(View view) {
                 CheckBox c = (CheckBox) view;
                 // Text is the keyword
-                TileOverlay overlay = mOverlays.get(keyword);
-                if (overlay != null) {
-                    overlay.setVisible(c.isChecked());
+                AirMapHeatmap heatmap = mHeatmaps.get(keyword);
+                if (heatmap != null) {
+                    if (c.isChecked()) {
+                        getMap().addHeatmap(heatmap);
+                    } else {
+                        getMap().removeHeatmap(heatmap);
+                    }
                 }
             }
         });
@@ -321,14 +324,12 @@ public class HeatmapsPlacesDemoFragment extends BaseDemoFragment {
 
             // Check that it wasn't an empty query.
             if (!points.isEmpty()) {
-                if (mOverlays.size() < MAX_CHECKBOXES) {
+                if (mHeatmaps.size() < MAX_CHECKBOXES) {
                     makeCheckBox(keyword);
-                    HeatmapTileProvider provider = new HeatmapTileProvider.Builder()
-                            .data(new ArrayList<LatLng>(points))
-                            .gradient(makeGradient(HEATMAP_COLORS[mOverlaysRendered]))
-                            .build();
-//                    TileOverlay overlay = getMap().addTileOverlay(new TileOverlayOptions().tileProvider(provider));
-//                    mOverlays.put(keyword, overlay);
+
+                    AirMapHeatmap heatmap = new AirMapHeatmap(keyword.hashCode(), points);
+                    getMap().addHeatmap(heatmap);
+                    mHeatmaps.put(keyword, heatmap);
                 }
                 mOverlaysRendered++;
                 if (mOverlaysRendered == mOverlaysInput) {
