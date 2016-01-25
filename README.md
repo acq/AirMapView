@@ -21,7 +21,11 @@ will fallback to a web based map provider (currently Google Maps). Easy to integ
 
 ![](screenshots/google_maps_v2.png)
 ![](screenshots/google_web_maps.png)
-
+<img src="screenshots/clustering_custom.png" width=200/>
+<img src="screenshots/ground_overlay_mapbox.png" width=200/>
+<img src="screenshots/heatmap_mapbox.png" width=200/>
+<img src="screenshots/kml_mapbox.png" width=200/>
+<img src="screenshots/compute_distance.png" width=200/>
 
 
 ## Download
