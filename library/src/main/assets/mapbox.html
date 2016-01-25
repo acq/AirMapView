@@ -9,6 +9,7 @@
     </style>
     <script src="MAPURL/mapbox.js"></script>
     <link href='MAPURL/mapbox.css' rel='stylesheet' />
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-heat/v0.1.3/leaflet-heat.js'></script>
 </head>
 
 <body>
@@ -22,6 +23,7 @@ var markers = {};
 var polylines = {};
 var polygons = {};
 var groundOverlays = {};
+var heatmaps = {};
 
 L.mapbox.accessToken = 'MAPBOX_ACCESS_TOKEN';
 map = L.mapbox.map('map', 'MAPBOX_MAPID').setView([0, 0], 10);
@@ -197,6 +199,22 @@ function removeGroundOverlay(id) {
   var overlay = groundOverlays[id];
   if (overlay != null) {
     map.removeLayer(overlay);
+  }
+}
+
+function addHeatmap(points, id) {
+  var data = points.map(function(obj){
+    return new L.LatLng(obj.lat,obj.lng);
+  });
+
+  var heatmap = L.heatLayer(data).addTo(map);
+  heatmaps[id] = heatmap;
+}
+
+function removeHeatmap(id) {
+  var heatmap = heatmaps[id];
+  if (heatmap != null) {
+    map.removeLayer(heatmap);
   }
 }
 

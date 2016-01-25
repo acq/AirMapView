@@ -10,7 +10,7 @@
         padding: 0px
         }
     </style>
-    <script src="MAPURL?v=3.exp&sensor=false&language=LANGTOKEN&region=REGIONTOKEN"></script>
+    <script src="MAPURL?v=3.exp&sensor=false&language=LANGTOKEN&region=REGIONTOKEN&libraries=visualization"></script>
     <script src="file:///android_asset/geolocate_user.js" type="text/javascript"></script>
     <script>
 var map;
@@ -20,6 +20,7 @@ var infoWindowContent = {};
 var polylines = {};
 var polygons = {};
 var groundOverlays = {};
+var heatmaps = {};
 var moveTimeout;
 var GeoMarker = null;
 var markerIconPrefix;
@@ -249,6 +250,25 @@ function removeGroundOverlay(id) {
   var overlay = groundOverlays[id];
   if (overlay != null) {
     overlay.setMap(null);
+  }
+}
+
+function addHeatmap(points, id) {
+  var data = points.map(function(obj){
+    return new google.maps.LatLng(obj.lat,obj.lng);
+  });
+
+  var heatmap = new google.maps.visualization.HeatmapLayer({
+    data: data,
+    map: map
+  });
+  heatmaps[id] = heatmap;
+}
+
+function removeHeatmap(id) {
+  var heatmap = heatmaps[id];
+  if (heatmap != null) {
+    heatmap.setMap(null);
   }
 }
 

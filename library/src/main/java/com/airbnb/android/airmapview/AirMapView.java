@@ -365,6 +365,22 @@ public class AirMapView extends FrameLayout
     return false;
   }
 
+  public boolean addHeatmap(AirMapHeatmap heatmap) {
+    if (isInitialized()) {
+      mapInterface.addHeatmap(heatmap);
+      return true;
+    }
+    return false;
+  }
+
+  public boolean removeHeatmap(AirMapHeatmap heatmap) {
+    if (isInitialized()) {
+      mapInterface.removeHeatmap(heatmap);
+      return true;
+    }
+    return false;
+  }
+
   @Override public void onCameraChanged(LatLng latLng, int zoom) {
     if (onCameraChangeListener != null) {
       onCameraChangeListener.onCameraChanged(latLng, zoom);

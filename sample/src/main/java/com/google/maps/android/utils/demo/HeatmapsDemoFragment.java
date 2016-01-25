@@ -16,7 +16,6 @@
 
 package com.google.maps.android.utils.demo;
 
-import android.graphics.Color;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
@@ -27,10 +26,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.airmapview.sample.R;
-import com.airbnb.android.airmapview.utils.heatmaps.Gradient;
-import com.airbnb.android.airmapview.utils.heatmaps.HeatmapTileProvider;
+import com.airbnb.android.airmapview.AirMapHeatmap;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.TileOverlay;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,41 +45,7 @@ import java.util.Scanner;
  */
 public class HeatmapsDemoFragment extends BaseDemoFragment {
 
-    /**
-     * Alternative radius for convolution
-     */
-    private static final int ALT_HEATMAP_RADIUS = 10;
-
-    /**
-     * Alternative opacity of heatmap overlay
-     */
-    private static final double ALT_HEATMAP_OPACITY = 0.4;
-
-    /**
-     * Alternative heatmap gradient (blue -> red)
-     * Copied from Javascript version
-     */
-    private static final int[] ALT_HEATMAP_GRADIENT_COLORS = {
-            Color.argb(0, 0, 255, 255),// transparent
-            Color.argb(255 / 3 * 2, 0, 255, 255),
-            Color.rgb(0, 191, 255),
-            Color.rgb(0, 0, 127),
-            Color.rgb(255, 0, 0)
-    };
-
-    public static final float[] ALT_HEATMAP_GRADIENT_START_POINTS = {
-            0.0f, 0.10f, 0.20f, 0.60f, 1.0f
-    };
-
-    public static final Gradient ALT_HEATMAP_GRADIENT = new Gradient(ALT_HEATMAP_GRADIENT_COLORS,
-            ALT_HEATMAP_GRADIENT_START_POINTS);
-
-    private HeatmapTileProvider mProvider;
-    private TileOverlay mOverlay;
-
-    private boolean mDefaultGradient = true;
-    private boolean mDefaultRadius = true;
-    private boolean mDefaultOpacity = true;
+    private AirMapHeatmap mHeatmap;
 
     /**
      * Maps name of data set to data (list of LatLngs)
@@ -122,36 +85,6 @@ public class HeatmapsDemoFragment extends BaseDemoFragment {
         // radius, gradient and opacity not specified, so default are used
     }
 
-    public void changeRadius(View view) {
-        if (mDefaultRadius) {
-            mProvider.setRadius(ALT_HEATMAP_RADIUS);
-        } else {
-            mProvider.setRadius(HeatmapTileProvider.DEFAULT_RADIUS);
-        }
-        mOverlay.clearTileCache();
-        mDefaultRadius = !mDefaultRadius;
-    }
-
-    public void changeGradient(View view) {
-        if (mDefaultGradient) {
-            mProvider.setGradient(ALT_HEATMAP_GRADIENT);
-        } else {
-            mProvider.setGradient(HeatmapTileProvider.DEFAULT_GRADIENT);
-        }
-        mOverlay.clearTileCache();
-        mDefaultGradient = !mDefaultGradient;
-    }
-
-    public void changeOpacity(View view) {
-        if (mDefaultOpacity) {
-            mProvider.setOpacity(ALT_HEATMAP_OPACITY);
-        } else {
-            mProvider.setOpacity(HeatmapTileProvider.DEFAULT_OPACITY);
-        }
-        mOverlay.clearTileCache();
-        mDefaultOpacity = !mDefaultOpacity;
-    }
-
     // Dealing with spinner choices
     public class SpinnerActivity implements AdapterView.OnItemSelectedListener {
         public void onItemSelected(AdapterView<?> parent, View view,
@@ -161,16 +94,13 @@ public class HeatmapsDemoFragment extends BaseDemoFragment {
             TextView attribution = ((TextView) getView().findViewById(R.id.attribution));
 
             // Check if need to instantiate (avoid setData etc twice)
-            if (mProvider == null) {
-                mProvider = new HeatmapTileProvider.Builder().data(
-                        mLists.get(getString(R.string.police_stations)).getData()).build();
-//                mOverlay = getMap().addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-                // Render links
-                attribution.setMovementMethod(LinkMovementMethod.getInstance());
-            } else {
-                mProvider.setData(mLists.get(dataset).getData());
-                mOverlay.clearTileCache();
+            if (mHeatmap != null) {
+                getMap().removeHeatmap(mHeatmap);
             }
+            mHeatmap = new AirMapHeatmap(0L, mLists.get(dataset).getData());
+            getMap().addHeatmap(mHeatmap);
+            // Render links
+            attribution.setMovementMethod(LinkMovementMethod.getInstance());
             // Update attribution
             attribution.setText(Html.fromHtml(String.format(getString(R.string.attrib_format),
                     mLists.get(dataset).getUrl())));

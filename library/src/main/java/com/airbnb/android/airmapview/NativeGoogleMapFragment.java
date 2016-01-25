@@ -32,6 +32,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.maps.android.geojson.GeoJsonLayer;
 import com.google.maps.android.geojson.GeoJsonPolygonStyle;
 
@@ -324,6 +326,18 @@ public class NativeGoogleMapFragment extends SupportMapFragment implements AirMa
   @Override
   public void removeGroundOverlay(AirMapGroundOverlay overlay) {
     overlay.getGoogleOverlay().remove();
+  }
+
+  @Override
+  public void addHeatmap(AirMapHeatmap heatmap) {
+    TileOverlayOptions overlayOptions = new TileOverlayOptions().tileProvider(heatmap.getTileProvider());
+    TileOverlay overlay = googleMap.addTileOverlay(overlayOptions);
+    heatmap.setGoogleOverlay(overlay);
+  }
+
+  @Override
+  public void removeHeatmap(AirMapHeatmap heatmap) {
+    heatmap.getGoogleOverlay().remove();
   }
 
   @Override public void setMapType(MapType type) {

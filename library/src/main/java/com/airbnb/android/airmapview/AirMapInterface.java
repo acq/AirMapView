@@ -221,4 +221,8 @@ public interface AirMapInterface {
   void addGroundOverlay(AirMapGroundOverlay overlay);
 
   void removeGroundOverlay(AirMapGroundOverlay overlay);
+
+  void addHeatmap(AirMapHeatmap heatmap);
+
+  void removeHeatmap(AirMapHeatmap heatmap);
 }

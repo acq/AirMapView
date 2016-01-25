@@ -39,6 +39,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.io.ByteArrayOutputStream;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 
@@ -272,21 +273,26 @@ public abstract class WebViewMapFragment extends Fragment implements AirMapInter
     // no-op
   }
 
+  private static String convertPointsToJsonString(Collection<LatLng> points) throws JSONException {
+    JSONArray array = new JSONArray();
+    for (LatLng point : points) {
+      JSONObject json = new JSONObject();
+      json.put("lat", point.latitude);
+      json.put("lng", point.longitude);
+      array.put(json);
+    }
+    return array.toString();
+  }
+
   @Override public <T> void addPolyline(AirMapPolyline<T> polyline) {
     if (polyline.getPoints() == null) {
       return;
     }
     try {
-      JSONArray array = new JSONArray();
-      for (LatLng point : polyline.getPoints()) {
-        JSONObject json = new JSONObject();
-        json.put("lat", point.latitude);
-        json.put("lng", point.longitude);
-        array.put(json);
-      }
+      String json = convertPointsToJsonString(polyline.getPoints());
 
       webView.loadUrl(String.format(
-          "javascript:addPolyline(" + array.toString() + ", %1$d, %2$d, %3$d);",
+          "javascript:addPolyline(" + json + ", %1$d, %2$d, %3$d);",
           polyline.getId(), polyline.getStrokeWidth(), polyline.getStrokeColor()));
     } catch (JSONException e) {
       Log.e(TAG, "error constructing polyline JSON", e);
@@ -299,25 +305,20 @@ public abstract class WebViewMapFragment extends Fragment implements AirMapInter
 
   @Override public <T> void addPolygon(AirMapPolygon<T> polygon) {
     try {
-      JSONArray array = new JSONArray();
-      for (LatLng point : polygon.getPolygonOptions().getPoints()) {
-        JSONObject json = new JSONObject();
-        json.put("lat", point.latitude);
-        json.put("lng", point.longitude);
-        array.put(json);
-      }
+      String json = convertPointsToJsonString(polygon.getPolygonOptions().getPoints());
 
-      webView.loadUrl(String.format(Locale.US,
-          "javascript:addPolygon(" + array.toString() + ", %1$d, %2$d, %3$d, %4$d);",
+      String format = String.format(Locale.US,
+          "javascript:addPolygon(" + json + ", %1$d, %2$d, %3$d, %4$d);",
           polygon.getId(),
           (int) polygon.getPolygonOptions().getStrokeWidth(),
           polygon.getPolygonOptions().getStrokeColor(),
-          polygon.getPolygonOptions().getFillColor()));
+          polygon.getPolygonOptions().getFillColor());
+      webView.loadUrl(format);
     } catch (JSONException e) {
-      Log.e(TAG, "error constructing polyline JSON", e);
+      Log.e(TAG, "error constructing polygon JSON", e);
     }
   }
-  
+
   @Override public void removePolygon(AirMapPolygon polygon) {
     webView.loadUrl(String.format(Locale.US, "javascript:removePolygon(%1$d);", polygon.getId()));
   }
@@ -335,6 +336,23 @@ public abstract class WebViewMapFragment extends Fragment implements AirMapInter
   public void removeGroundOverlay(AirMapGroundOverlay overlay) {
     webView.loadUrl(String.format(Locale.US,
         "javascript:removeGroundOverlay(%1$d);", overlay.getId()));
+  }
+
+  @Override
+  public void addHeatmap(AirMapHeatmap heatmap) {
+    try {
+      String format = String.format(Locale.US,
+          "javascript:addHeatmap(%1$s, %2$s);", convertPointsToJsonString(heatmap.getData()), heatmap.getId());
+      webView.loadUrl(format);
+    } catch (JSONException e) {
+      Log.e(TAG, "error constructing heatmap JSON", e);
+    }
+  }
+
+  @Override
+  public void removeHeatmap(AirMapHeatmap heatmap) {
+    webView.loadUrl(String.format(Locale.US,
+        "javascript:removeHeatmap(%1$s);", heatmap.getId()));
   }
 
   @Override public void setOnMapClickListener(final OnMapClickListener listener) {
