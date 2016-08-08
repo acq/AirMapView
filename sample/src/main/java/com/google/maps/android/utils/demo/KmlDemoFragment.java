@@ -28,7 +28,6 @@ public class KmlDemoFragment extends BaseDemoFragment {
     public void startDemo () {
         try {
             retrieveFileFromResource();
-            retrieveFileFromUrl();
         } catch (Exception e) {
             Log.e("Exception caught", e.toString());
         }
@@ -38,15 +37,10 @@ public class KmlDemoFragment extends BaseDemoFragment {
         try {
             KmlLayer kmlLayer = new KmlLayer(mMap, R.raw.campus, getContext());
             kmlLayer.addLayerToMap();
+            moveCameraToKml(kmlLayer);
         } catch (IOException | XmlPullParserException e) {
             e.printStackTrace();
         }
-    }
-
-    private void retrieveFileFromUrl() {
-        String url = "https://kml-samples.googlecode.com/svn/trunk/" +
-                "morekml/Polygons/Polygons.Google_Campus.kml";
-        new DownloadKmlFile(url).execute();
     }
 
     private void moveCameraToKml(KmlLayer kmlLayer) {
