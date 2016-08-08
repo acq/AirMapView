@@ -41,16 +41,13 @@ import org.json.JSONException;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity
-    implements OnCameraChangeListener, OnMapInitializedListener,
-    OnMapClickListener, OnCameraMoveListener, OnMapMarkerClickListener,
-    OnInfoWindowClickListener, OnLatLngScreenLocationCallback {
+    implements OnCameraChangeListener, OnMapInitializedListener{
 
   private final LogsAdapter adapter = new LogsAdapter();
 
   private static final String TAG = MainActivity.class.getSimpleName();
   private AirMapView map;
   private DefaultAirMapViewBuilder mapViewBuilder;
-  private RecyclerView logsRecyclerView;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -58,9 +55,6 @@ public class MainActivity extends AppCompatActivity
 
     mapViewBuilder = new DefaultAirMapViewBuilder(this);
     map = (AirMapView) findViewById(R.id.map);
-    logsRecyclerView = (RecyclerView) findViewById(R.id.logs);
-    ((LinearLayoutManager) logsRecyclerView.getLayoutManager()).setReverseLayout(true);
-    logsRecyclerView.setAdapter(adapter);
     Button btnMapTypeNormal = (Button) findViewById(R.id.btnMapTypeNormal);
     Button btnMapTypeSattelite = (Button) findViewById(R.id.btnMapTypeSattelite);
     Button btnMapTypeTerrain = (Button) findViewById(R.id.btnMapTypeTerrain);
@@ -83,12 +77,6 @@ public class MainActivity extends AppCompatActivity
       }
     });
 
-    map.setOnMapClickListener(this);
-    map.setOnCameraChangeListener(this);
-    map.setOnCameraMoveListener(this);
-    map.setOnMarkerClickListener(this);
-    map.setOnMapInitializedListener(this);
-    map.setOnInfoWindowClickListener(this);
     map.initialize(getSupportFragmentManager());
   }
 
@@ -149,9 +137,7 @@ public class MainActivity extends AppCompatActivity
           @Override
           public void onSnapshotReady(@Nullable Bitmap bitmap) {
             if (bitmap != null) {
-              appendBitmap(bitmap);
             } else {
-              appendLog("Null bitmap");
             }
           }
         });
@@ -169,12 +155,9 @@ public class MainActivity extends AppCompatActivity
   }
 
   @Override public void onCameraChanged(LatLng latLng, int zoom) {
-    appendLog("Map onCameraChanged triggered with lat: " + latLng.latitude + ", lng: "
-        + latLng.longitude);
   }
 
   @Override public void onMapInitialized() {
-    appendLog("Map onMapInitialized triggered");
     final LatLng airbnbLatLng = new LatLng(37.771883, -122.405224);
     addMarker("Airbnb HQ", airbnbLatLng, 1);
     addMarker("Performance Bikes", new LatLng(37.773975, -122.40205), 2);
@@ -213,43 +196,5 @@ public class MainActivity extends AppCompatActivity
         .title(title)
         .iconId(R.mipmap.icon_location_pin)
         .build());
-  }
-
-  @Override public void onMapClick(LatLng latLng) {
-    if (latLng != null) {
-      appendLog(
-          "Map onMapClick triggered with lat: " + latLng.latitude + ", lng: "
-              + latLng.longitude);
-
-      map.getMapInterface().getScreenLocation(latLng, this);
-    } else {
-      appendLog("Map onMapClick triggered with null latLng");
-    }
-  }
-
-  @Override public void onCameraMove() {
-    appendLog("Map onCameraMove triggered");
-  }
-
-  private void appendLog(String msg) {
-    adapter.addString(msg);
-    logsRecyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
-  }
-
-  private void appendBitmap(Bitmap bitmap) {
-    adapter.addBitmap(bitmap);
-    logsRecyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
-  }
-
-  @Override public void onMapMarkerClick(AirMapMarker airMarker) {
-    appendLog("Map onMapMarkerClick triggered with id " + airMarker.getId());
-  }
-
-  @Override public void onInfoWindowClick(AirMapMarker airMarker) {
-    appendLog("Map onInfoWindowClick triggered with id " + airMarker.getId());
-  }
-
-  @Override public void onLatLngScreenLocationReady(Point point) {
-    appendLog("LatLng location on screen (x,y): (" + point.x + "," + point.y + ")");
   }
 }
