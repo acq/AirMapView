@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         addDemo("IconGenerator", IconGeneratorDemoFragment.class);
         addDemo("SphericalUtil.computeDistanceBetween", DistanceDemoFragment.class);
 //        addDemo("Generating tiles", TileProviderAndProjectionDemo.class);
+        addDemo("Ground Overlay", GroundOverlayDemoFragment.class);
         addDemo("Heatmaps", HeatmapsDemoFragment.class);
         addDemo("Heatmaps with Places API", HeatmapsPlacesDemoFragment.class);
         addDemo("GeoJSON Layer", GeoJsonDemoFragment.class);
