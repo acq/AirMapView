@@ -3,6 +3,7 @@ package com.airbnb.android.airmapview;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -96,6 +97,10 @@ public abstract class WebViewMapFragment extends Fragment implements AirMapInter
     webViewSettings.setAllowFileAccess(false);
     webViewSettings.setAllowContentAccess(false);
     webView.setWebChromeClient(new GeoWebChromeClient());
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      WebView.setWebContentsDebuggingEnabled(true);
+    }
 
     AirMapType mapType = AirMapType.fromBundle(getArguments());
     webView.loadDataWithBaseURL(mapType.getDomain(), mapType.getMapData(getResources()),
