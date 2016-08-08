@@ -32,7 +32,6 @@ import android.widget.Toast;
 
 import com.airbnb.airmapview.sample.R;
 import com.airbnb.android.airmapview.AirMapHeatmap;
-import com.airbnb.android.airmapview.AirMapView;
 import com.airbnb.android.airmapview.utils.SphericalUtil;
 import com.airbnb.android.airmapview.utils.heatmaps.Gradient;
 import com.google.android.gms.maps.model.LatLng;
@@ -57,8 +56,6 @@ import java.util.Hashtable;
  * as well as demonstrating the various color options and dealing with multiple heatmaps.
  */
 public class HeatmapsPlacesDemoFragment extends BaseDemoFragment {
-
-    private AirMapView mMap = null;
 
     private final LatLng SYDNEY = new LatLng(-33.873651, 151.2058896);
 
@@ -142,7 +139,7 @@ public class HeatmapsPlacesDemoFragment extends BaseDemoFragment {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                 boolean handled = false;
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
                     submit();
                     handled = true;
                 }
@@ -155,14 +152,9 @@ public class HeatmapsPlacesDemoFragment extends BaseDemoFragment {
     }
 
     private void setUpMap() {
-        if (mMap == null) {
-            mMap = getMap();
-            if (mMap != null) {
-                mMap.animateCenterZoom(SYDNEY, 11);
-                // Add a circle around Sydney to roughly encompass the results
-                mMap.drawCircle(SYDNEY, (int) (SEARCH_RADIUS * 1.2), Color.RED, 4);
-            }
-        }
+        getMap().animateCenterZoom(SYDNEY, 11);
+        // Add a circle around Sydney to roughly encompass the results
+        getMap().drawCircle(SYDNEY, (int) (SEARCH_RADIUS * 1.2), Color.RED, 4);
     }
 
     /**
