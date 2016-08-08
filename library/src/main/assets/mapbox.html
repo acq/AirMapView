@@ -225,7 +225,7 @@ function addCircle(lat, lng, radius, strokeColor, strokeWeight, fillColor) {
 }
 
 function mapClick(event) {
-  AirMapView.mapClick(event.latLng.lat(), event.latLng.lng());
+  AirMapView.mapClick(event.latLng.lat, event.latLng.lng);
 }
 
 function mapMove() {
@@ -236,7 +236,7 @@ function mapMove() {
   moveTimeout = setTimeout(function() {
     var latLng = map.getCenter();
     if (latLng != null) {
-      AirMapView.mapMove(latLng.lat(), latLng.lng(), map.getZoom());
+      AirMapView.mapMove(latLng.lat, latLng.lng, map.getZoom());
     }
   }, 200);
 }
@@ -244,7 +244,7 @@ function mapMove() {
 function getCenter() {
   var latLng = map.getCenter();
   if (latLng != null) {
-    AirMapView.mapCenterCallback(latLng.lat(), latLng.lng());
+    AirMapView.mapCenterCallback(latLng.lat, latLng.lng);
   }
 }
 
@@ -252,7 +252,7 @@ function getBounds() {
   bounds = map.getBounds();
   ne = bounds.getNorthEast();
   sw = bounds.getSouthWest();
-  AirMapView.getBoundsCallback(ne.lat(), ne.lng(), sw.lat(), sw.lng());
+  AirMapView.getBoundsCallback(ne.lat, ne.lng, sw.lat, sw.lng);
 }
 
 function getScreenLocation(lat, lng) {
