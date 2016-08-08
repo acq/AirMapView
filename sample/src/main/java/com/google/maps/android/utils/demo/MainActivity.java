@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         addDemo("Heatmaps", HeatmapsDemoFragment.class);
         addDemo("Heatmaps with Places API", HeatmapsPlacesDemoFragment.class);
         addDemo("GeoJSON Layer", GeoJsonDemoFragment.class);
+        addDemo("GeoJSON Layer 2", GeoJson2DemoFragment.class);
         addDemo("KML Layer Overlay", KmlDemoFragment.class);
 
         DefaultDemoFragment defaultDemoFragment = new DefaultDemoFragment();
