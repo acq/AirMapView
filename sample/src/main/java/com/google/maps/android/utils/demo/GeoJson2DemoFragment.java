@@ -4,10 +4,11 @@ import android.util.Log;
 
 import com.airbnb.airmapview.sample.R;
 import com.airbnb.airmapview.sample.Util;
-import com.airbnb.android.airmapview.AirMapGeoJsonLayer;
+import com.airbnb.android.airmapview.utils.geojson.GeoJsonLayer;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public class GeoJson2DemoFragment extends BaseDemoFragment {
 
@@ -17,13 +18,9 @@ public class GeoJson2DemoFragment extends BaseDemoFragment {
   protected void startDemo() {
     // Draws a layer on top of Australia
     String geoJsonString = Util.readFromRawResource(getActivity(), R.raw.google);
-    AirMapGeoJsonLayer layer = new AirMapGeoJsonLayer.Builder(geoJsonString)
-        .strokeColor(getResources().getColor(android.R.color.holo_green_dark))
-        .strokeWidth(10)
-        .fillColor(getResources().getColor(android.R.color.holo_green_light))
-        .build();
     try {
-      getMap().getMapInterface().setGeoJsonLayer(layer);
+      GeoJsonLayer layer = new GeoJsonLayer(getMap(), new JSONObject(geoJsonString));
+      layer.addLayerToMap();
       getMap().animateCenterZoom(new LatLng(-25.56, 135.57), 3);
     } catch (JSONException e) {
       Log.e(TAG, "Failed to add GeoJson layer", e);
